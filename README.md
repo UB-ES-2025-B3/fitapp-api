@@ -13,6 +13,14 @@ Una vez añadido, IntelliJ proporciona de plugins para leer archivos `.env`, com
 Creaos una base de datos MySQL con lo que querais y el nombre que querais (p.e. fitapp)
 y poned la URL en vuestro `.env` junto al user y la password para acceder a ella.
 
+Actualizacion: la base de datos ahora se carga automaticamente con Docker Compose. La
+configuracion se encuentra en el .yml. Antes de ejecutar la 
+aplicacion de spring, aseguraos de tener Docker y Docker Compose instalados y ejecutad el comando:
+
+```
+docker-compose up -d
+```
+
 ## Estructura del Proyecto
 
 La estructura es **feature-first**: cada “feature” agrupa su controller, service, repos,

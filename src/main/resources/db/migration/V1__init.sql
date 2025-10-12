@@ -1,0 +1,32 @@
+set NAMES utf8mb4;
+
+CREATE TABLE user_auth (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(190) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    account_non_expired BOOLEAN NOT NULL DEFAULT TRUE,
+    account_non_locked BOOLEAN NOT NULL DEFAULT TRUE,
+    credentials_non_expired BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT uk_user_auth_email UNIQUE (email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE user_profile (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT NOT NULL,
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
+    birth_date DATE,
+    height_cm DECIMAL(5,2) NULL CHECK (height_cm BETWEEN 50 AND 300),
+    weight_kg DECIMAL(5,2) NULL CHECK (weight_kg BETWEEN 20 AND 500),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT uk_user_profile_user UNIQUE (user_id),
+    CONSTRAINT fk_user_profile_user FOREIGN KEY (user_id)
+        REFERENCES user_auth(id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -1,0 +1,27 @@
+services:
+  mysql:
+    image: 'mysql:latest'
+    environment:
+      - MYSQL_DATABASE=${DB_NAME}
+      - 'MYSQL_ROOT_PASSWORD=root'
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    ports:
+        - '3307:3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  phpmyadmin:
+    image: 'phpmyadmin:latest'
+    links:
+      - mysql
+    environment:
+      - PMA_HOST=mysql
+      - PMA_PORT=3306
+    ports:
+      - '8081:80'
+    depends_on:
+      - mysql
+
+volumes:
+  mysql_data:

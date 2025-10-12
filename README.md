@@ -21,6 +21,8 @@ aplicacion de spring, aseguraos de tener Docker y Docker Compose instalados y ej
 docker-compose up -d
 ```
 
+Se puede acceder a la interfaz de phpMyAdmin en `http://localhost:8081` con las credenciales definidas en el archivo `docker-compose.yml`.
+
 ## Estructura del Proyecto
 
 La estructura es **feature-first**: cada “feature” agrupa su controller, service, repos,

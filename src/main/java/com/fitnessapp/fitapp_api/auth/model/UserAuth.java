@@ -1,4 +1,4 @@
-package com.fitnessapp.fitapp_api.entity;
+package com.fitnessapp.fitapp_api.auth.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

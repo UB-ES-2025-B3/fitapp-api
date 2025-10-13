@@ -39,7 +39,8 @@ public class UserAuth {
     @Column(name = "credentials_non_expired", nullable = false)
     private boolean credentialsNonExpired = true;
 
-    @PrePersist @PreUpdate
+    @PrePersist
+    @PreUpdate
     private void normalizeEmail() {
         if (this.email != null) {
             this.email = this.email.trim().toLowerCase();

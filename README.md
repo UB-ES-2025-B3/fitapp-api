@@ -10,18 +10,20 @@ tu **`.gitignore`**.
 Una vez añadido, IntelliJ proporciona de plugins para leer archivos `.env`, como **EnvFile**.
 
 ## Configuración de base de datos
-Creaos una base de datos MySQL con lo que querais y el nombre que querais (p.e. fitapp)
-y poned la URL en vuestro `.env` junto al user y la password para acceder a ella.
+La base de datos ahora se carga automaticamente con Docker Compose. La
+configuración se encuentra en el `docker-compose.yml`. 
+Configurad vuestro `.env` con el user y password que querais usar para acceder a la base de datos.
+**Recordad que se ejecuta en el puerto 3307.**
 
-Actualizacion: la base de datos ahora se carga automaticamente con Docker Compose. La
-configuracion se encuentra en el .yml. Antes de ejecutar la 
-aplicacion de spring, aseguraos de tener Docker y Docker Compose instalados y ejecutad el comando:
+Antes de ejecutar la aplicacion de Spring, aseguraos de tener **Docker y Docker Compose instalados** y
+ejecutad el comando:
 
 ```
 docker-compose up -d
 ```
 
-Se puede acceder a la interfaz de phpMyAdmin en `http://localhost:8081` con las credenciales definidas en el archivo `docker-compose.yml`.
+Se puede acceder a la interfaz de phpMyAdmin en `http://localhost:8081` con las credenciales definidas
+en el archivo `docker-compose.yml`.
 
 ## Estructura del Proyecto
 
@@ -74,3 +76,33 @@ src/main/resources/
 - **Validación**: Bean Validation en DTOs; errores coherentes vía `GlobalExceptionHandler`.
 - **Seguridad**: Protección en `core/security` y/o anotaciones `@PreAuthorize`.
 - **/config**: WebConfig: CORS global consumido por Security; OpenApiConfig: metadatos opcionales de Swagger.
+- **Nomenclatura (interfaces/impls)**:
+    - Interfaz: nombre sin prefijos, describe el contrato → `UserService`.
+    - Implementación: `UserServiceImpl`.
+- **Inyección de dependencias**: 
+  - Inyecta SIEMPRE la interfaz, nunca la implementación concreta, en controllers y services.
+    → Favorece el desacoplamiento, testeo y cambios de estrategia sin tocar consumidores. 
+  - Usa inyección por constructor (Lombok @RequiredArgsConstructor) y campos *final*. Evitar @Autowired.
+
+## Seguridad & CORS
+
+- API stateless con JWT (csrf off; sin httpBasic/formLogin).
+- CORS global en config/WebConfig leyendo app.cors.origins.
+- JWT: filtro JwtTokenValidator (antes de UsernamePasswordAuthenticationFilter).
+- Errores JSON consistentes (ErrorResponseFactory + GlobalExceptionHandler).
+- En caso de añadir una Excepción personalizada, asegurarse de que se trate en el `GlobalExceptionHandler`.
+### Rutas públicas
+- POST /api/v1/auth/register
+- POST /api/v1/auth/login
+- /v3/api-docs/**, /swagger-ui/**, /swagger-ui.html
+- OPTIONS /**
+
+El resto requiere `Authorization: Bearer <jwt>`.
+
+### Formato de error
+Manejado por ErrorResponseFactory.
+
+Ejemplo de error:
+{ "error": "...", "message": "...", "path": "/...", "timestamp": "ISO-8601", "details"[] }
+
+- "details": es opcional, sale en errores de validación de datos en las requests.

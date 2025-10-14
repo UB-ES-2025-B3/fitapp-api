@@ -1,6 +1,7 @@
 package com.fitnessapp.fitapp_api.auth.controller;
 
 import com.fitnessapp.fitapp_api.auth.dto.LoginUserRequestDTO;
+import com.fitnessapp.fitapp_api.auth.dto.LoginUserResponseDTO;
 import com.fitnessapp.fitapp_api.auth.dto.RegisterUserRequestDTO;
 import com.fitnessapp.fitapp_api.auth.dto.UserAuthResponseDTO;
 import com.fitnessapp.fitapp_api.auth.service.IUserAuthService;
@@ -102,8 +103,8 @@ public class UserAuthController {
     )
     // Endpoint for user registration
     @PostMapping("/login")
-    public ResponseEntity<UserAuthResponseDTO> login(@Valid @RequestBody LoginUserRequestDTO loginUserRequestDTO) {
-        UserAuthResponseDTO userAuthResponseDTO = userAuthService.login(loginUserRequestDTO);
+    public ResponseEntity<LoginUserResponseDTO> login(@Valid @RequestBody LoginUserRequestDTO loginUserRequestDTO) {
+        LoginUserResponseDTO userAuthResponseDTO = userAuthService.login(loginUserRequestDTO);
         return ResponseEntity.ok(userAuthResponseDTO);
     }
 }

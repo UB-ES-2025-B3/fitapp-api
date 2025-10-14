@@ -1,5 +1,6 @@
 package com.fitnessapp.fitapp_api.auth.controller;
 
+import com.fitnessapp.fitapp_api.auth.dto.LoginUserRequestDTO;
 import com.fitnessapp.fitapp_api.auth.dto.RegisterUserRequestDTO;
 import com.fitnessapp.fitapp_api.auth.dto.UserAuthResponseDTO;
 import com.fitnessapp.fitapp_api.auth.service.IUserAuthService;
@@ -66,5 +67,43 @@ public class UserAuthController {
                 .buildAndExpand(userAuthResponseDTO.id())
                 .toUri();
         return ResponseEntity.created(location).body(userAuthResponseDTO);
+    }
+
+    @Operation(
+            summary = "Inicio de sesión de usuario",
+            description = "Iniciar sessión a un usuario y retorna un token JWT para autenticación.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = LoginUserRequestDTO.class)
+                    )
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Usuario logueado exitosamente",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = UserAuthResponseDTO.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "409",
+                            description = "Credenciales incorrectas",
+                            content = @Content(mediaType = "application/json")
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Datos de entrada inválidos",
+                            content = @Content(mediaType = "application/json")
+                    )
+            }
+    )
+    // Endpoint for user registration
+    @PostMapping("/login")
+    public ResponseEntity<UserAuthResponseDTO> login(@Valid @RequestBody LoginUserRequestDTO loginUserRequestDTO) {
+        UserAuthResponseDTO userAuthResponseDTO = userAuthService.login(loginUserRequestDTO);
+        return ResponseEntity.ok(userAuthResponseDTO);
     }
 }

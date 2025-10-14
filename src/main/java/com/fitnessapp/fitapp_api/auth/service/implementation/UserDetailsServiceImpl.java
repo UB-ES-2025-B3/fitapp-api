@@ -19,6 +19,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserAuthRepository userRepo;
 
+    // Aunque se llame username, como nosotros le pasamos al Authentication el email y dentro de este
+    // también usamos el email, entonces no deberia de haber error
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 

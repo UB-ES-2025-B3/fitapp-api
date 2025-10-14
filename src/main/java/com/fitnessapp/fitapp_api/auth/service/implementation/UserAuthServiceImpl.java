@@ -1,5 +1,6 @@
 package com.fitnessapp.fitapp_api.auth.service.implementation;
 
+import com.fitnessapp.fitapp_api.auth.dto.LoginUserRequestDTO;
 import com.fitnessapp.fitapp_api.auth.dto.RegisterUserRequestDTO;
 import com.fitnessapp.fitapp_api.auth.dto.UserAuthResponseDTO;
 import com.fitnessapp.fitapp_api.auth.mapper.UserAuthMapper;
@@ -8,11 +9,13 @@ import com.fitnessapp.fitapp_api.auth.repository.UserAuthRepository;
 import com.fitnessapp.fitapp_api.auth.service.IUserAuthService;
 import com.fitnessapp.fitapp_api.core.exception.UserAlreadyExistsException;
 import com.fitnessapp.fitapp_api.core.util.JwtUtils;
+import com.fitnessapp.fitapp_api.profile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +28,8 @@ public class UserAuthServiceImpl implements IUserAuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
     private final AuthenticationManager authenticationManager;
+
+    private final UserProfileRepository userProfileRepository;
 
     @Override
     public UserAuthResponseDTO register(RegisterUserRequestDTO registerUserRequestDTO) {
@@ -55,6 +60,33 @@ public class UserAuthServiceImpl implements IUserAuthService {
                 savedUser.getId(),
                 token,
                 false
+        );
+    }
+
+    @Override
+    public UserAuthResponseDTO login(LoginUserRequestDTO loginUserRequestDTO) {
+        // Autenticar al usuario recién registrado y generar el token JWT
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginUserRequestDTO.email(),
+                        loginUserRequestDTO.password()
+                )
+        );
+        // Se guarda el usuario autenticado en el contexto de seguridad.
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String token = jwtUtils.createToken(authentication);
+
+        // Obtenemos el ID del usuario logueado
+        var userAuth = userAuthRepository.findByEmail(loginUserRequestDTO.email())
+                .orElseThrow(() -> new UsernameNotFoundException("El usuario no fue encontrado"));
+        Boolean profileExists = userProfileRepository.existsByUser_Email(loginUserRequestDTO.email());
+
+        // Retornar un DTO response con el token
+        return new UserAuthResponseDTO(
+                userAuth.getId(),
+                token,
+                profileExists
         );
     }
 }

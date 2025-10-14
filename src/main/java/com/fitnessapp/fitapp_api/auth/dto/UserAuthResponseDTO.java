@@ -4,6 +4,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 public record UserAuthResponseDTO(
         @Schema(
+                description = "Id generado para el usuario autenticado",
+                example = "1"
+        )
+        Long id,
+        @Schema(
                 description = "JWT generado para el usuario autenticado",
                 example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
         )
@@ -14,4 +19,5 @@ public record UserAuthResponseDTO(
                 example = "false"
         )
         boolean profileExists
-) {}
+) {
+}

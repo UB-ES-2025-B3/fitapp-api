@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -44,10 +45,14 @@ public class UserAuthServiceImpl implements IUserAuthService {
                         registerUserRequestDTO.password()
                 )
         );
+        // Se guarda el usuario autenticado en el contexto de seguridad.
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
         String token = jwtUtils.createToken(authentication);
 
         // Retornar un DTO response con el token
         return new UserAuthResponseDTO(
+                savedUser.getId(),
                 token,
                 false
         );

@@ -9,12 +9,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,7 +30,7 @@ public class UserAuthController {
             description = "Registra un nuevo usuario y retorna un token JWT para autenticación.",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     required = true,
-                    content = @Content (
+                    content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = RegisterUserRequestDTO.class)
                     )
@@ -57,6 +59,12 @@ public class UserAuthController {
     // Endpoint for user registration
     @PostMapping("/register")
     public ResponseEntity<UserAuthResponseDTO> register(@Valid @RequestBody RegisterUserRequestDTO registerUserRequestDTO) {
-        return new ResponseEntity<>(this.userAuthService.register(registerUserRequestDTO), HttpStatus.CREATED);
+        UserAuthResponseDTO userAuthResponseDTO = userAuthService.register(registerUserRequestDTO);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/api/v1/users/{id}")
+                .buildAndExpand(userAuthResponseDTO.id())
+                .toUri();
+        return ResponseEntity.created(location).body(userAuthResponseDTO);
     }
 }

@@ -13,7 +13,7 @@ public record RegisterUserRequestDTO(
                 minLength = 5,
                 maxLength = 255,
                 pattern = "^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$",
-                required = true
+                requiredMode = Schema.RequiredMode.REQUIRED
         )
         @NotBlank(message = "Email is required")
         @Email(message = "Email format is invalid")
@@ -24,11 +24,12 @@ public record RegisterUserRequestDTO(
                 example = "Passw0rd!",
                 minLength = 8,
                 pattern = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[^A-Za-z\\d]).+$",
-                required = true
+                requiredMode = Schema.RequiredMode.REQUIRED
         )
         @NotBlank(message = "Password is required")
         @Size(min = 8, message = "Password must be at least 8 characters long")
         @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[^A-Za-z\\d]).+$",
                 message = "La contraseña debe tener al menos una letra, un número y un símbolo")
         String password
-) {}
+) {
+}

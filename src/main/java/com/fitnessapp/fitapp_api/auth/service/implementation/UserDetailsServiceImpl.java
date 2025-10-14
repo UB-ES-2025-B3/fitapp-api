@@ -1,4 +1,4 @@
-package com.fitnessapp.fitapp_api.auth.service;
+package com.fitnessapp.fitapp_api.auth.service.implementation;
 
 import com.fitnessapp.fitapp_api.auth.model.UserAuth;
 import com.fitnessapp.fitapp_api.auth.repository.UserAuthRepository;

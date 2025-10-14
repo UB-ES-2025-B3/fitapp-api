@@ -1,5 +1,6 @@
 package com.fitnessapp.fitapp_api.core.handler;
 
+import com.fitnessapp.fitapp_api.core.exception.UserAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -152,5 +153,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("Unhandled error at {}:", req.getRequestURI(), ex);
         return errorFactory.entity(HttpStatus.INTERNAL_SERVER_ERROR, "internal_error",
                 "Unexpected error", req.getRequestURI(), Map.of());
+    }
+
+    /**
+     * 409 - Usuario (email) ya existe (registro)
+     */
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<Object> handleUserAlreadyExists(UserAlreadyExistsException ex, HttpServletRequest req) {
+        return errorFactory.entity(HttpStatus.CONFLICT, "user_already_exists",
+                ex.getMessage(), req.getRequestURI(), Map.of());
     }
 }

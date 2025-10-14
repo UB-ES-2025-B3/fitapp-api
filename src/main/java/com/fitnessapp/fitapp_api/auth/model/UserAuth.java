@@ -39,6 +39,7 @@ public class UserAuth {
     @Column(name = "credentials_non_expired", nullable = false)
     private boolean credentialsNonExpired = true;
 
+    // Normalización del email antes de persistir o actualizar
     @PrePersist
     @PreUpdate
     private void normalizeEmail() {

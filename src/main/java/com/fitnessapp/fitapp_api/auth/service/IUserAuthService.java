@@ -1,7 +1,9 @@
 package com.fitnessapp.fitapp_api.auth.service;
 
-import com.fitnessapp.fitapp_api.auth.dto.UserAuthDTO;
+import com.fitnessapp.fitapp_api.auth.dto.RegisterUserRequestDTO;
+import com.fitnessapp.fitapp_api.auth.dto.UserAuthResponseDTO;
 
 public interface IUserAuthService {
-    UserAuthDTO register(UserAuthDTO userAuthDTO);
+    // Metodo para registrar un nuevo usuario
+    UserAuthResponseDTO register(RegisterUserRequestDTO registerUserRequestDTO);
 }

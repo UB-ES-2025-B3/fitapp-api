@@ -72,7 +72,7 @@ public class UserAuthController {
 
     @Operation(
             summary = "Inicio de sesión de usuario",
-            description = "Iniciar sessión a un usuario y retorna un token JWT para autenticación.",
+            description = "Iniciar sesión a un usuario y retorna un token JWT para autenticación.",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     required = true,
                     content = @Content(
@@ -86,7 +86,7 @@ public class UserAuthController {
                             description = "Usuario logueado exitosamente",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = UserAuthResponseDTO.class)
+                                    schema = @Schema(implementation = LoginUserResponseDTO.class)
                             )
                     ),
                     @ApiResponse(
@@ -101,7 +101,7 @@ public class UserAuthController {
                     )
             }
     )
-    // Endpoint for user registration
+    // Endpoint for user login
     @PostMapping("/login")
     public ResponseEntity<LoginUserResponseDTO> login(@Valid @RequestBody LoginUserRequestDTO loginUserRequestDTO) {
         LoginUserResponseDTO userAuthResponseDTO = userAuthService.login(loginUserRequestDTO);

@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-public record RegisterUserRequestDTO(
+public record LoginUserRequestDTO(
         @Schema(
                 description = "Correo electrónico del usuario",
                 example = "usuario@email.com",

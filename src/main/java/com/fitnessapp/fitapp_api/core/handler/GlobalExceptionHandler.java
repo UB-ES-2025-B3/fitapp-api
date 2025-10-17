@@ -146,6 +146,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
+     * 409 - Usuario (email) ya existe (registro)
+     */
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<Object> handleUserAlreadyExists(UserAlreadyExistsException ex, HttpServletRequest req) {
+        return errorFactory.entity(HttpStatus.CONFLICT, "user_already_exists",
+                ex.getMessage(), req.getRequestURI(), Map.of());
+    }
+
+    /**
      * 500 — Fallback general (errores no contemplados)
      */
     @ExceptionHandler(RuntimeException.class)
@@ -155,12 +164,4 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 "Unexpected error", req.getRequestURI(), Map.of());
     }
 
-    /**
-     * 409 - Usuario (email) ya existe (registro)
-     */
-    @ExceptionHandler(UserAlreadyExistsException.class)
-    public ResponseEntity<Object> handleUserAlreadyExists(UserAlreadyExistsException ex, HttpServletRequest req) {
-        return errorFactory.entity(HttpStatus.CONFLICT, "user_already_exists",
-                ex.getMessage(), req.getRequestURI(), Map.of());
-    }
 }

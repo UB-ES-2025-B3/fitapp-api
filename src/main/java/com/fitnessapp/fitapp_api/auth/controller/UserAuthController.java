@@ -1,5 +1,7 @@
 package com.fitnessapp.fitapp_api.auth.controller;
 
+import com.fitnessapp.fitapp_api.auth.dto.LoginUserRequestDTO;
+import com.fitnessapp.fitapp_api.auth.dto.LoginUserResponseDTO;
 import com.fitnessapp.fitapp_api.auth.dto.RegisterUserRequestDTO;
 import com.fitnessapp.fitapp_api.auth.dto.UserAuthResponseDTO;
 import com.fitnessapp.fitapp_api.auth.service.IUserAuthService;
@@ -66,5 +68,43 @@ public class UserAuthController {
                 .buildAndExpand(userAuthResponseDTO.id())
                 .toUri();
         return ResponseEntity.created(location).body(userAuthResponseDTO);
+    }
+
+    @Operation(
+            summary = "Inicio de sesión de usuario",
+            description = "Iniciar sesión a un usuario y retorna un token JWT para autenticación.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = LoginUserRequestDTO.class)
+                    )
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Usuario logueado exitosamente",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = LoginUserResponseDTO.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "409",
+                            description = "Credenciales incorrectas",
+                            content = @Content(mediaType = "application/json")
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Datos de entrada inválidos",
+                            content = @Content(mediaType = "application/json")
+                    )
+            }
+    )
+    // Endpoint for user login
+    @PostMapping("/login")
+    public ResponseEntity<LoginUserResponseDTO> login(@Valid @RequestBody LoginUserRequestDTO loginUserRequestDTO) {
+        LoginUserResponseDTO userAuthResponseDTO = userAuthService.login(loginUserRequestDTO);
+        return ResponseEntity.ok(userAuthResponseDTO);
     }
 }

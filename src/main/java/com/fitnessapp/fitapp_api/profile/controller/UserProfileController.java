@@ -1,35 +1,37 @@
-// java
-package com.fitnessapp.fitapp_api.profile.controller;
+java
+        package com.fitnessapp.fitapp_api.profile.controller;
 
-import com.fitnessapp.fitapp_api.profile.dto.UserProfileDto;
-import com.fitnessapp.fitapp_api.profile.service.IUserProfileService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import com.fitnessapp.fitapp_api.profile.model.UserProfile;
+import com.fitnessapp.fitapp_api.profile.service.UserProfileService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/api/v1/profiles")
-@RequiredArgsConstructor
+@RequestMapping("/api/v1/profile")
 public class UserProfileController {
 
-    private final IUserProfileService profileService;
+    private final UserProfileService service;
+
+    public UserProfileController(UserProfileService service) {
+        this.service = service;
+    }
 
     @GetMapping("/me")
-    public ResponseEntity<UserProfileDto> getMe(Principal principal) {
-        return ResponseEntity.ok(profileService.getMyProfile(principal.getName()));
+    public ResponseEntity<UserProfile> getMyProfile(Principal principal) {
+        return ResponseEntity.ok(service.getMyProfile(principal));
     }
 
     @PostMapping("/me")
-    public ResponseEntity<UserProfileDto> createMe(Principal principal, @RequestBody UserProfileDto dto) {
-        UserProfileDto created = profileService.createMyProfile(principal.getName(), dto);
-        return new ResponseEntity<>(created, HttpStatus.CREATED);
+    public ResponseEntity<UserProfile> createMyProfile(Principal principal, @RequestBody UserProfile body) {
+        UserProfile created = service.createMyProfile(principal, body);
+        return ResponseEntity.ok(created);
     }
 
     @PutMapping("/me")
-    public ResponseEntity<UserProfileDto> updateMe(Principal principal, @RequestBody UserProfileDto dto) {
-        return ResponseEntity.ok(profileService.updateMyProfile(principal.getName(), dto));
+    public ResponseEntity<UserProfile> updateMyProfile(Principal principal, @RequestBody UserProfile body) {
+        UserProfile updated = service.updateMyProfile(principal, body);
+        return ResponseEntity.ok(updated);
     }
 }

@@ -12,6 +12,7 @@ public interface UserProfileMapper {
     @Mapping(target = "email", source = "email")
     UserProfileResponseDTO toResponseDto(UserProfile userProfile, String email);
 
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "user", source = "userAuth")
     UserProfile toEntity(UserProfileRequestDTO dto, UserAuth userAuth);
 }

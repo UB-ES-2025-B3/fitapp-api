@@ -1,11 +1,11 @@
 {
 	"info": {
-		"_postman_id": "24f14424-8adc-491a-8d7a-33fc3fa04010",
+		"_postman_id": "14d90a0e-c539-4dfd-b698-82f7e7feb435",
 		"name": "Colección para pruebas de los endpoints de la FitApp-API",
 		"description": "`bottom text`",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "47807271",
-		"_collection_link": "https://joanlica-4482134.postman.co/workspace/Joan-Lira's-Workspace~805feac0-b848-4750-86d9-54141d3be72c/collection/47807271-24f14424-8adc-491a-8d7a-33fc3fa04010?action=share&source=collection_link&creator=47807271"
+		"_exporter_id": "49266091",
+		"_collection_link": "https://rodo1204-8219919.postman.co/workspace/Rodolfo-Romeo-Hernandez-Villarr~1d01ef67-b579-46e5-8fac-b682d05b121d/collection/49266091-14d90a0e-c539-4dfd-b698-82f7e7feb435?action=share&source=collection_link&creator=49266091"
 	},
 	"item": [
 		{
@@ -528,7 +528,7 @@
 					]
 				},
 				{
-					"name": "Obtener Perfil por ID",
+					"name": "Obtener Perfil por Email",
 					"event": [
 						{
 							"listen": "test",
@@ -726,7 +726,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"collection\": {\n        \"info\": {\n            \"name\": \"{{collectionName}}\",\n            \"schema\": \"{{collectionSchemaUrl}}\"\n        },\n        \"item\": [\n            {\n                \"request\": {}\n            }\n        ]\n    }\n}"
+							"raw": "{\n    \"firstName\": \"Juan\",\n    \"lastName\": \"Pérez\",\n    \"birthDate\": \"1995-06-15\",\n    \"heightCm\": 178.5,\n    \"weightKg\": 100.9\n}"
 						},
 						"url": {
 							"raw": "http://localhost:8080/api/v1/auth/register",
@@ -1046,7 +1046,41 @@
 					]
 				}
 			],
-			"description": "Endpoints para la gestion del perfil de usuario"
+			"description": "Endpoints para la gestion del perfil de usuario\n\nPara usar cualquiera de las request debes primero ejecutar login user para autenticar y poder gestionar tu perfil",
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJmaXRhcHBfYXBpIiwic3ViIjoiZXhhbXBsZUBob3RtYWlsLmNvbSIsImF1dGhvcml0aWVzIjpbXSwiaWF0IjoxNzYwODE5NzcyLCJleHAiOjE3NjA4MjE1NzIsImp0aSI6ImI0YjQ3NzdlLTAyNjItNDUwOC1hNzk0LTQwM2Y3MTc5YWI3NiIsIm5iZiI6MTc2MDgxOTc3Mn0.eKlpYuvU8sAe7XcoMk6KMIZeuDam6yZb6q_fF5uloHI",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
 		}
 	],
 	"auth": {

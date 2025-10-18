@@ -1,16 +1,16 @@
 
 package com.fitnessapp.fitapp_api.profile.service;
 
-import com.fitnessapp.fitapp_api.profile.dto.UserProfileDto;
-import com.fitnessapp.fitapp_api.profile.model.UserProfile;
+import com.fitnessapp.fitapp_api.profile.dto.UserProfileRequestDTO;
+import com.fitnessapp.fitapp_api.profile.dto.UserProfileResponseDTO;
 
 import java.security.Principal;
 
-public interface UserProfileService {
+public interface IUserProfileService {
 
-    UserProfile getMyProfile(Principal principal);
+    UserProfileResponseDTO getMyProfile(Principal principal);
 
-    UserProfile createMyProfile(Principal principal, UserProfile toCreate);
+    UserProfileResponseDTO createMyProfile(Principal principal, UserProfileRequestDTO toCreate);
 
-    UserProfile updateMyProfile(Principal principal, UserProfile toUpdate);
+    UserProfileResponseDTO updateMyProfile(Principal principal, UserProfileRequestDTO toUpdate);
 }

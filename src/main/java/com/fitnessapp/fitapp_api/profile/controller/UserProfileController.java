@@ -114,6 +114,7 @@ public class UserProfileController {
                 .toUri();
         return ResponseEntity.created(location).body(created);
     }
+
     /**
      * PUT /me
      */

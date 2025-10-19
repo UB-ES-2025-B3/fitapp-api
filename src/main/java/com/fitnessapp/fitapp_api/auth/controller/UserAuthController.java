@@ -4,7 +4,7 @@ import com.fitnessapp.fitapp_api.auth.dto.LoginUserRequestDTO;
 import com.fitnessapp.fitapp_api.auth.dto.LoginUserResponseDTO;
 import com.fitnessapp.fitapp_api.auth.dto.RegisterUserRequestDTO;
 import com.fitnessapp.fitapp_api.auth.dto.UserAuthResponseDTO;
-import com.fitnessapp.fitapp_api.auth.service.IUserAuthService;
+import com.fitnessapp.fitapp_api.auth.service.UserAuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,7 +25,7 @@ import java.net.URI;
 @RequestMapping("/api/v1/auth")
 public class UserAuthController {
 
-    private final IUserAuthService userAuthService;
+    private final UserAuthService userAuthService;
 
     @Operation(
             summary = "Registrar nuevo usuario",

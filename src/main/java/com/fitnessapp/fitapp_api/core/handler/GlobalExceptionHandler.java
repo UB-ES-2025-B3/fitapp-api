@@ -1,6 +1,9 @@
 package com.fitnessapp.fitapp_api.core.handler;
 
 import com.fitnessapp.fitapp_api.core.exception.UserAlreadyExistsException;
+import com.fitnessapp.fitapp_api.core.exception.UserAuthNotFoundException;
+import com.fitnessapp.fitapp_api.core.exception.UserProfileAlreadyExistsException;
+import com.fitnessapp.fitapp_api.core.exception.UserProfileNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.LinkedHashMap;
@@ -164,4 +168,46 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 "Unexpected error", req.getRequestURI(), Map.of());
     }
 
+    /**
+     * 404 - Perfil de usuario no encontrado
+     */
+    @ExceptionHandler(UserProfileNotFoundException.class)
+    public ResponseEntity<Object> handleUserProfileNotFound(UserProfileNotFoundException ex, HttpServletRequest req) {
+        return errorFactory.entity(HttpStatus.NOT_FOUND, "user_profile_not_found",
+                ex.getMessage(), req.getRequestURI(), Map.of());
+    }
+
+    /**
+     * 404 - Usuario no encontrado
+     */
+    @ExceptionHandler(UserAuthNotFoundException.class)
+    public ResponseEntity<Object> handleUserAuthNotFound(UserAuthNotFoundException ex, HttpServletRequest req) {
+        return errorFactory.entity(HttpStatus.NOT_FOUND, "user_not_found",
+                ex.getMessage(), req.getRequestURI(), Map.of());
+    }
+
+    /**
+     * 409 - Perfil ya existe para el usuario
+     */
+    @ExceptionHandler(UserProfileAlreadyExistsException.class)
+    public ResponseEntity<Object> handleUserProfileAlreadyExists(UserProfileAlreadyExistsException ex, HttpServletRequest req) {
+        return errorFactory.entity(HttpStatus.CONFLICT, "user_profile_already_exists",
+                ex.getMessage(), req.getRequestURI(), Map.of());
+    }
+
+    /**
+     * Manejo genérico de ResponseStatusException lanzadas en servicios o controladores
+     */
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<Object> handleResponseStatusException(ResponseStatusException ex, HttpServletRequest req) {
+        HttpStatus status = HttpStatus.valueOf(ex.getStatusCode().value());
+        String code = switch (status) {
+            case NOT_FOUND -> "not_found";
+            case BAD_REQUEST -> "bad_request";
+            case CONFLICT -> "conflict";
+            default -> "error";
+        };
+        return errorFactory.entity(status, code,
+                ex.getReason() != null ? ex.getReason() : "Error", req.getRequestURI(), Map.of());
+    }
 }

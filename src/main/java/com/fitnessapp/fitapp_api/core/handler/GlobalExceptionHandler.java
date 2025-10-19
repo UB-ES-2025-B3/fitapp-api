@@ -187,6 +187,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
+     * 409 - Perfil ya existe para el usuario
+     */
+    @ExceptionHandler(UserProfileAlreadyExistsException.class)
+    public ResponseEntity<Object> handleUserProfileAlreadyExists(UserProfileAlreadyExistsException ex, HttpServletRequest req) {
+        return errorFactory.entity(HttpStatus.CONFLICT, "user_profile_already_exists",
+                ex.getMessage(), req.getRequestURI(), Map.of());
+    }
+
+    /**
      * Manejo genérico de ResponseStatusException lanzadas en servicios o controladores
      */
     @ExceptionHandler(ResponseStatusException.class)
@@ -201,15 +210,4 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return errorFactory.entity(status, code,
                 ex.getReason() != null ? ex.getReason() : "Error", req.getRequestURI(), Map.of());
     }
-
-    /**
-     * 409 - Perfil ya existe para el usuario
-     */
-    @ExceptionHandler(UserProfileAlreadyExistsException.class)
-    public ResponseEntity<Object> handleUserProfileAlreadyExists(UserProfileAlreadyExistsException ex, HttpServletRequest req) {
-        return errorFactory.entity(HttpStatus.CONFLICT, "user_profile_already_exists",
-                ex.getMessage(), req.getRequestURI(), Map.of());
-    }
-
-    // TODO: definir constantes para los códigos de error usados
 }

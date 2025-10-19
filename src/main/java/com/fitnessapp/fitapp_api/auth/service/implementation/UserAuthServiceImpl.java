@@ -7,7 +7,7 @@ import com.fitnessapp.fitapp_api.auth.dto.UserAuthResponseDTO;
 import com.fitnessapp.fitapp_api.auth.mapper.UserAuthMapper;
 import com.fitnessapp.fitapp_api.auth.model.UserAuth;
 import com.fitnessapp.fitapp_api.auth.repository.UserAuthRepository;
-import com.fitnessapp.fitapp_api.auth.service.IUserAuthService;
+import com.fitnessapp.fitapp_api.auth.service.UserAuthService;
 import com.fitnessapp.fitapp_api.core.exception.UserAlreadyExistsException;
 import com.fitnessapp.fitapp_api.core.util.JwtUtils;
 import com.fitnessapp.fitapp_api.profile.repository.UserProfileRepository;
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-public class UserAuthServiceImpl implements IUserAuthService {
+public class UserAuthServiceImpl implements UserAuthService {
 
     private final UserAuthRepository userAuthRepository;
     private final UserAuthMapper mapper;

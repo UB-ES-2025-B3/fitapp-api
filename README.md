@@ -82,7 +82,7 @@ src/main/resources/
 - **Inyección de dependencias**: 
   - Inyecta SIEMPRE la interfaz, nunca la implementación concreta, en controllers y services.
     → Favorece el desacoplamiento, testeo y cambios de estrategia sin tocar consumidores. 
-  - Usa inyección por constructor (Lombok @RequiredArgsConstructor) y campos *final*. Evitar @Autowired.
+  - Usa inyección por constructor (Lombok @RequiredArgsConstructor) y campos *final*. Evitar uso de @Autowired.
 
 ## Seguridad & CORS
 

@@ -2,7 +2,7 @@ package com.fitnessapp.fitapp_api.profile.controller;
 
 import com.fitnessapp.fitapp_api.profile.dto.UserProfileRequestDTO;
 import com.fitnessapp.fitapp_api.profile.dto.UserProfileResponseDTO;
-import com.fitnessapp.fitapp_api.profile.service.IUserProfileService;
+import com.fitnessapp.fitapp_api.profile.service.UserProfileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,19 +14,19 @@ import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/profile")
+@RequestMapping("/api/v1/profiles")
 public class UserProfileController {
 
-    private final IUserProfileService service;
+    private final UserProfileService service;
 
     @GetMapping("/me")
     public ResponseEntity<UserProfileResponseDTO> getMyProfile(Principal principal) {
-        return ResponseEntity.ok(service.getMyProfile(principal));
+        return ResponseEntity.ok(service.getMyProfile(principal.getName()));
     }
 
     @PostMapping("/me")
     public ResponseEntity<UserProfileResponseDTO> createMyProfile(Principal principal, @Valid @RequestBody UserProfileRequestDTO body) {
-        UserProfileResponseDTO created = service.createMyProfile(principal, body);
+        UserProfileResponseDTO created = service.createMyProfile(principal.getName(), body);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .build()
@@ -36,7 +36,7 @@ public class UserProfileController {
 
     @PutMapping("/me")
     public ResponseEntity<UserProfileResponseDTO> updateMyProfile(Principal principal, @Valid @RequestBody UserProfileRequestDTO body) {
-        UserProfileResponseDTO updated = service.updateMyProfile(principal, body);
+        UserProfileResponseDTO updated = service.updateMyProfile(principal.getName(), body);
         return ResponseEntity.ok(updated);
     }
 }

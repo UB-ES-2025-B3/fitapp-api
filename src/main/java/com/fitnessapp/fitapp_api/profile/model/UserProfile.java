@@ -1,6 +1,7 @@
 package com.fitnessapp.fitapp_api.profile.model;
 
 import com.fitnessapp.fitapp_api.auth.model.UserAuth;
+import com.fitnessapp.fitapp_api.profile.util.Gender;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,6 +34,10 @@ public class UserProfile {
 
     @Column(name = "last_name", length = 100)
     private String lastName;
+
+    @Column(name = "gender", length = 20)
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
     @Column(name = "birth_date")
     private LocalDate birthDate;

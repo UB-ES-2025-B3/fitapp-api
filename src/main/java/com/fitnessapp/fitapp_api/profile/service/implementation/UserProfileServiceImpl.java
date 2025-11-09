@@ -64,6 +64,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         // Update fields
         existingProfile.setFirstName(toUpdate.firstName());
         existingProfile.setLastName(toUpdate.lastName());
+        existingProfile.setGender(toUpdate.gender());
         existingProfile.setBirthDate(toUpdate.birthDate());
         existingProfile.setHeightCm(toUpdate.heightCm());
         existingProfile.setWeightKg(toUpdate.weightKg());

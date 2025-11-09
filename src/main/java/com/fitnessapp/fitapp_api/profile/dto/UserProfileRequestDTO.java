@@ -1,5 +1,6 @@
 package com.fitnessapp.fitapp_api.profile.dto;
 
+import com.fitnessapp.fitapp_api.profile.util.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -30,6 +31,14 @@ public record UserProfileRequestDTO(
         @NotBlank(message = "Last name is required")
         @Size(max = 100, message = "Last name must be 100 characters or less")
         String lastName,
+
+        @Schema(
+                description = "Género biologico del usuario",
+                example = "MALE",
+                requiredMode = Schema.RequiredMode.REQUIRED
+        )
+        @NotNull(message = "Gender is required")
+        Gender gender,
 
         @Schema(
                 description = "Fecha de nacimiento del usuario (formato AAAA-MM-DD)",

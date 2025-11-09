@@ -1,0 +1,1 @@
+ALTER TABLE user_profile ADD COLUMN gender VARCHAR(20) NULL CHECK (gender IN ('MALE', 'FEMALE'));

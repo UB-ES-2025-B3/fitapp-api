@@ -84,7 +84,7 @@ public record UserProfileRequestDTO(
                 example = "America/New_York",
                 requiredMode = Schema.RequiredMode.REQUIRED
         )
-        @NotBlank(message = "Time zone is required")
+        @NotNull(message = "Time zone is required")
         ZoneId timeZone
 ) {
 }

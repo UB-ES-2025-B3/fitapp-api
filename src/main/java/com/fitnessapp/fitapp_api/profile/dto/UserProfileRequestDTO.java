@@ -7,6 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.ZoneId;
 
 public record UserProfileRequestDTO(
 
@@ -76,6 +77,14 @@ public record UserProfileRequestDTO(
         @DecimalMin(value = "20.0", message = "Weight must be at least 20 kg")
         @DecimalMax(value = "500.0", message = "Weight cannot exceed 500 kg")
         @Digits(integer = 3, fraction = 2, message = "Weight must be a valid number with up to 3 digits and 2 decimal places")
-        BigDecimal weightKg
+        BigDecimal weightKg,
+
+        @Schema(
+                description = "Zona horaria del usuario",
+                example = "America/New_York",
+                requiredMode = Schema.RequiredMode.REQUIRED
+        )
+        @NotBlank(message = "Time zone is required")
+        ZoneId timeZone
 ) {
 }

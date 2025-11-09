@@ -4,6 +4,7 @@ import com.fitnessapp.fitapp_api.profile.util.Gender;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.ZoneId;
 
 public record UserProfileResponseDTO(
         String email,
@@ -12,6 +13,7 @@ public record UserProfileResponseDTO(
         Gender gender,
         LocalDate birthDate,
         BigDecimal heightCm,
-        BigDecimal weightKg
+        BigDecimal weightKg,
+        ZoneId timeZone
 ) {
 }

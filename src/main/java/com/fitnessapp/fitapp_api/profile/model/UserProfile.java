@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.ZoneId;
 
 @Getter
 @Setter
@@ -47,5 +48,8 @@ public class UserProfile {
 
     @Column(name = "weight_kg", precision = 5, scale = 2)
     private BigDecimal weightKg;
+
+    @Column(name = "time_zone", length = 50)
+    private ZoneId timeZone;
 
 }

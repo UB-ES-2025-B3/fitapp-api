@@ -6,12 +6,12 @@ CREATE TABLE routes (
     name VARCHAR(100) NOT NULL,
     start_point VARCHAR(255) NOT NULL,
     end_point VARCHAR(255) NOT NULL,
-    distance_km DOUBLE NOT NULL,
+    distance_km DECIMAL(10,2) NULL,
     deleted BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_route_user FOREIGN KEY (user_id)
-        REFERENCES user_auth(id)
-        ON DELETE CASCADE
+       REFERENCES user_auth(id)
+       ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

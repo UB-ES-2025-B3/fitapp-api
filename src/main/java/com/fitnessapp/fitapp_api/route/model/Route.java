@@ -2,9 +2,10 @@ package com.fitnessapp.fitapp_api.route.model;
 
 import com.fitnessapp.fitapp_api.auth.model.UserAuth;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import org.hibernate.annotations.SoftDelete;
+import org.hibernate.annotations.SoftDeleteType;
 import lombok.*;
+import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -15,6 +16,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@SoftDelete(strategy = SoftDeleteType.DELETED, columnName = "deleted")
 public class Route {
 
     @EqualsAndHashCode.Include
@@ -26,23 +28,16 @@ public class Route {
     @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "fk_route_user"))
     private UserAuth user;
 
-    @NotBlank
-    @Size(min = 1, max = 100)
     @Column(nullable = false, length = 100)
     private String name;
 
-    @NotBlank
     @Column(name = "start_point", nullable = false)
-    private String startPoint; // ejemplo: "lat,lng"
+    private String startPoint;
 
-    @NotBlank
     @Column(name = "end_point", nullable = false)
     private String endPoint;
 
-    @Column(name = "distance_km", nullable = false)
-    private Double distanceKm;
-
-    @Column(nullable = false)
-    private Boolean deleted = false;
+    @Column(name = "distance_km", precision = 10, scale = 2)
+    private BigDecimal distanceKm;
 
 }

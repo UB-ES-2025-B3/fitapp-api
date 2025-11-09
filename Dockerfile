@@ -2,7 +2,7 @@
 # ETAPA 1: BUILD (Construcción del JAR)
 # -------------------------------------
 # Usamos una imagen de Maven con Java 21
-FROM maven:3.9.5-eclipse-temurin-21 AS build
+FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
 
 # 1. Copia solo el pom.xml para optimizar la caché de dependencias.

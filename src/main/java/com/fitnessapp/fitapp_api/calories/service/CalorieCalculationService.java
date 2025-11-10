@@ -5,5 +5,5 @@ import com.fitnessapp.fitapp_api.profile.model.UserProfile;
 
 
 public interface CalorieCalculationService {
-    int calculateCalories(UserProfile profile, CCActivityRequest activity);
+    double calculateCalories(UserProfile profile, CCActivityRequest activity);
 }

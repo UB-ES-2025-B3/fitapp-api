@@ -8,13 +8,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.Period;
 
 @Service
 @RequiredArgsConstructor
 public class CalorieCalculationServiceImpl {
     private final UserProfileService userProfileService;
 
-    double calculateCalories(UserProfile profile, CCActivityRequest activity) {
+    public double calculateCalories(UserProfile profile, CCActivityRequest activity) {
         if (!userProfileService.isProfileComplete(profile)) {
             throw new UserProfileNotCompletedException("User profile is not completed.");
         }
@@ -31,9 +32,9 @@ public class CalorieCalculationServiceImpl {
     }
 
     private double calculateBMR(String gender, double weight, double height, int age) {
-        if (gender.equals("MASCULINO")) {
+        if (gender.equals("MALE")) {
             return (10 * weight) + (6.25 * height) - (5 * age) + 5;
-        } else if (gender.equals("FEMENINO")) {
+        } else if (gender.equals("FEMALE")) {
             return (10 * weight) + (6.25 * height) - (5 * age) - 161;
         } else {
             throw new IllegalArgumentException("Invalid gender: " + gender);
@@ -62,11 +63,6 @@ public class CalorieCalculationServiceImpl {
     }
 
     private int getAge(LocalDate birthDate) {
-        LocalDate today = LocalDate.now();
-        int age = today.getYear() - birthDate.getYear();
-        if (today.getDayOfYear() < birthDate.getDayOfYear()) {
-            age--;
-        }
-        return age;
+        return Period.between(birthDate, LocalDate.now()).getYears();
     }
 }

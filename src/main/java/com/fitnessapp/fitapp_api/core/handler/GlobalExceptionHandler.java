@@ -1,9 +1,6 @@
 package com.fitnessapp.fitapp_api.core.handler;
 
-import com.fitnessapp.fitapp_api.core.exception.UserAlreadyExistsException;
-import com.fitnessapp.fitapp_api.core.exception.UserAuthNotFoundException;
-import com.fitnessapp.fitapp_api.core.exception.UserProfileAlreadyExistsException;
-import com.fitnessapp.fitapp_api.core.exception.UserProfileNotFoundException;
+import com.fitnessapp.fitapp_api.core.exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -209,5 +206,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         };
         return errorFactory.entity(status, code,
                 ex.getReason() != null ? ex.getReason() : "Error", req.getRequestURI(), Map.of());
+    }
+
+    /**
+     * 404 - Ruta no encontrada
+     */
+    @ExceptionHandler(RouteNotFoundException.class)
+    public ResponseEntity<Object> handleRouteNotFound(RouteNotFoundException ex, HttpServletRequest req) {
+        return errorFactory.entity(HttpStatus.NOT_FOUND, "route_not_found",
+                ex.getMessage(), req.getRequestURI(), Map.of());
     }
 }

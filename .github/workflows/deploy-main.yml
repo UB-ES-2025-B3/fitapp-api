@@ -1,0 +1,68 @@
+# Nombre del workflow (lo verás en la pestaña "Actions" de GitHub)
+name: Desplegar Backend en Azure App Service
+
+# Triggers
+on:
+  # 1. Cuando se mergea a 'main'
+  push:
+    branches:
+      - main
+
+  # 2. Cuando se ABRE o ACTUALIZA un PR hacia 'main'
+  # ESTO NOS PERMITE PROBAR ANTES DE MERGEAR
+  pull_request:
+    branches:
+      - main
+
+  # 3. Trigger MANUAL: (Solo aparecerá después del primer merge a 'main')
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    # Usamos el sistema operativo estándar para builds
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Descarga el código del repositorio
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      # 2. Login en Azure (para el despliegue del App Service)
+      # Usa el JSON del Service Principal que guardamos como 'AZURE_CREDENTIALS' (AC2)
+      - name: 'Login en Azure'
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # 3. Login en el ACR (para subir la imagen Docker)
+      # Esta acción usa las credenciales de Azure (del paso 2) para loguearse en el ACR
+      - name: 'Login en Azure Container Registry (ACR)'
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+
+      # 4. Construye y Sube la imagen Docker al ACR
+      # - Construye usando el Dockerfile de la raíz (AC5)
+      # - Etiqueta la imagen con el SHA del commit (ej. ...:e4a2c1) para un versionado único
+      - name: Construir y subir la imagen Docker
+        run: |
+          docker build . -t ${{ secrets.ACR_LOGIN_SERVER }}/fitapp-backend:${{ github.sha }}
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/fitapp-backend:${{ github.sha }}
+
+      # 5. Despliega en Azure App Service
+      # App Service (fitapp-backend-api) usa la nueva imagen que acabamos de subir (AC7)
+      - name: 'Desplegar en Azure App Service'
+        uses: azure/webapps-deploy@v3
+        with:
+          # El nombre del App Service de backend
+          app-name: 'fitapp-backend-api'
+
+          # La imagen exacta que debe usar (la que acabamos de etiquetar con el SHA)
+          images: '${{ secrets.ACR_LOGIN_SERVER }}/fitapp-backend:${{ github.sha }}'
+
+      # 6. Logout de Azure por seguridad
+      - name: Logout de Azure
+        if: always()
+        run: |
+          docker logout ${{ secrets.ACR_LOGIN_SERVER }}
+          az logout

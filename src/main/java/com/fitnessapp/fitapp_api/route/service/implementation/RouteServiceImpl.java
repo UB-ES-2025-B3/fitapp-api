@@ -10,6 +10,7 @@ import com.fitnessapp.fitapp_api.route.model.Route;
 import com.fitnessapp.fitapp_api.route.repository.RouteRepository;
 import com.fitnessapp.fitapp_api.route.service.RouteService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ public class RouteServiceImpl implements RouteService {
 
     private final RouteRepository routeRepository;
     private final UserAuthRepository userAuthRepository;
+    @Qualifier("routeMapper")
     private final RouteMapper mapper;
 
     @Override

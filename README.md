@@ -9,21 +9,32 @@ tu **`.gitignore`**.
 
 Una vez añadido, IntelliJ proporciona de plugins para leer archivos `.env`, como **EnvFile**.
 
-## Configuración de base de datos
-La base de datos ahora se carga automaticamente con Docker Compose. La
-configuración se encuentra en el `docker-compose.yml`. 
-Configurad vuestro `.env` con el user y password que querais usar para acceder a la base de datos.
-**Recordad que se ejecuta en el puerto 3307.**
+## Configuración de base de datos y Ejecución Local
+La base de datos y la aplicación backend ahora se cargan automáticamente con Docker Compose. La
+configuración completa se encuentra en el docker-compose.yml.
 
-Antes de ejecutar la aplicacion de Spring, aseguraos de tener **Docker y Docker Compose instalados** y
-ejecutad el comando:
+Configurad vuestro .env con las credenciales (DB_USER, DB_PASSWORD, PRIVATE_KEY, etc.) que queráis usar.
+Recordad que la BBDD (MySQL) se expone en el puerto 3307 y la API en el 8080.
+
+Antes de ejecutar la aplicación, aseguraos de tener Docker y Docker Compose instalados y
+ejecutad el comando (usa la sintaxis moderna):
 
 ```
-docker-compose up -d
+# Construye las imágenes (si no existen) y levanta los servicios
+docker compose up --build
+
+# Para ejecutar en segundo plano (detached):
+# docker compose up -d
+
 ```
 
 Se puede acceder a la interfaz de phpMyAdmin en `http://localhost:8081` con las credenciales definidas
 en el archivo `docker-compose.yml`.
+
+## Archivos de Configuración de DevOps
+- Dockerfile: Define la construcción de la imagen multi-etapa para la API de Spring Boot.
+
+- .dockerignore: Excluye archivos de desarrollo (.env, .idea, target/) de la imagen de Docker.
 
 ## Estructura del Proyecto
 

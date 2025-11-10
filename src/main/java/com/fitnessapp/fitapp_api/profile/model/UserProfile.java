@@ -1,11 +1,13 @@
 package com.fitnessapp.fitapp_api.profile.model;
 
 import com.fitnessapp.fitapp_api.auth.model.UserAuth;
+import com.fitnessapp.fitapp_api.profile.util.Gender;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.ZoneId;
 
 @Getter
 @Setter
@@ -34,6 +36,10 @@ public class UserProfile {
     @Column(name = "last_name", length = 100)
     private String lastName;
 
+    @Column(name = "gender", length = 20)
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
@@ -42,5 +48,8 @@ public class UserProfile {
 
     @Column(name = "weight_kg", precision = 5, scale = 2)
     private BigDecimal weightKg;
+
+    @Column(name = "time_zone", length = 50)
+    private ZoneId timeZone;
 
 }

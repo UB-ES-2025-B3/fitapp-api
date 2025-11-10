@@ -1,11 +1,13 @@
 package com.fitnessapp.fitapp_api.profile.dto;
 
+import com.fitnessapp.fitapp_api.profile.util.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.ZoneId;
 
 public record UserProfileRequestDTO(
 
@@ -30,6 +32,14 @@ public record UserProfileRequestDTO(
         @NotBlank(message = "Last name is required")
         @Size(max = 100, message = "Last name must be 100 characters or less")
         String lastName,
+
+        @Schema(
+                description = "Género biologico del usuario",
+                example = "MALE",
+                requiredMode = Schema.RequiredMode.REQUIRED
+        )
+        @NotNull(message = "Gender is required")
+        Gender gender,
 
         @Schema(
                 description = "Fecha de nacimiento del usuario (formato AAAA-MM-DD)",
@@ -67,6 +77,14 @@ public record UserProfileRequestDTO(
         @DecimalMin(value = "20.0", message = "Weight must be at least 20 kg")
         @DecimalMax(value = "500.0", message = "Weight cannot exceed 500 kg")
         @Digits(integer = 3, fraction = 2, message = "Weight must be a valid number with up to 3 digits and 2 decimal places")
-        BigDecimal weightKg
+        BigDecimal weightKg,
+
+        @Schema(
+                description = "Zona horaria del usuario",
+                example = "America/New_York",
+                requiredMode = Schema.RequiredMode.REQUIRED
+        )
+        @NotNull(message = "Time zone is required")
+        ZoneId timeZone
 ) {
 }

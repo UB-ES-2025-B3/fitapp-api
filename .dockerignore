@@ -1,0 +1,24 @@
+# Exclusión de artefactos de control de versiones
+.git
+.gitignore
+
+# Exclusión de archivos de compilación, binarios y artefactos generados localmente
+# Se excluyen los directorios de salida de la compilación y los archivos compilados (.class, .jar).
+target/
+bin/
+**/*.class
+target/*.jar
+
+# Exclusión de archivos de configuración de entornos de desarrollo (IDE)
+.idea
+*.iws
+*.iml
+*.ipr
+.vscode/
+.mvn/
+.env
+
+
+# Exclusión de registros de actividad y archivos temporales
+*.log
+tmp/

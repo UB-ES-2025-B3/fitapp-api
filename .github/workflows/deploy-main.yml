@@ -8,13 +8,7 @@ on:
     branches:
       - main
 
-  # 2. Cuando se ABRE o ACTUALIZA un PR hacia 'main'
-  # ESTO NOS PERMITE PROBAR ANTES DE MERGEAR
-  pull_request:
-    branches:
-      - main
-
-  # 3. Trigger MANUAL: (Solo aparecerá después del primer merge a 'main')
+  # 2. Trigger MANUAL: (Solo aparecerá después del primer merge a 'main')
   workflow_dispatch:
 
 jobs:

@@ -82,10 +82,10 @@ public class UserProfileServiceImpl implements UserProfileService {
                 ));
 
         return profile.getFirstName() != null &&
-               profile.getLastName() != null &&
-               profile.getBirthDate() != null &&
-               profile.getHeightCm() != null &&
-               profile.getWeightKg() != null;
+                profile.getLastName() != null &&
+                profile.getBirthDate() != null &&
+                profile.getHeightCm() != null &&
+                profile.getWeightKg() != null;
     }
 
     @Override

@@ -3,13 +3,18 @@ name: Desplegar Backend en Azure App Service
 
 # Triggers
 on:
-  # Cuando se mergea a 'main'
+  # 1. Cuando se mergea a 'main'
   push:
     branches:
       - main
 
-  # Trigger manual: Añade un "Run workflow" en la pestaña Actions
-  # (Esto nos permite probarlo en 'dev' sin mergear a 'main')
+  # 2. Cuando se ABRE o ACTUALIZA un PR hacia 'main'
+  # ESTO NOS PERMITE PROBAR ANTES DE MERGEAR
+  pull_request:
+    branches:
+      - main
+
+  # 3. Trigger MANUAL: (Solo aparecerá después del primer merge a 'main')
   workflow_dispatch:
 
 jobs:
@@ -34,7 +39,7 @@ jobs:
       - name: 'Login en Azure Container Registry (ACR)'
         uses: azure/docker-login@v1
         with:
-          login-server: ${{ secrets.ACR_LOGIN_SERVER }} # (AC4)
+          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
 
       # 4. Construye y Sube la imagen Docker al ACR
       # - Construye usando el Dockerfile de la raíz (AC5)
@@ -42,7 +47,7 @@ jobs:
       - name: Construir y subir la imagen Docker
         run: |
           docker build . -t ${{ secrets.ACR_LOGIN_SERVER }}/fitapp-backend:${{ github.sha }}
-          docker push ${{ secrets.ACR_LOGIN_SERVER }}/fitapp-backend:${{ github.sha }} # (AC6)
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/fitapp-backend:${{ github.sha }}
 
       # 5. Despliega en Azure App Service
       # App Service (fitapp-backend-api) usa la nueva imagen que acabamos de subir (AC7)
@@ -57,7 +62,7 @@ jobs:
 
       # 6. Logout de Azure por seguridad
       - name: Logout de Azure
-        if: always() # Se ejecuta siempre
+        if: always()
         run: |
           docker logout ${{ secrets.ACR_LOGIN_SERVER }}
           az logout

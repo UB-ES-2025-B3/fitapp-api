@@ -3,7 +3,6 @@ services:
   mysql:
     image: 'mysql:8.0.33' # Recomiendo fijar la versión (vs 'latest')
     environment:
-      # ... (variables de entorno como las tenías)
       - MYSQL_DATABASE=${DB_NAME}
       - 'MYSQL_ROOT_PASSWORD=root'
       - MYSQL_USER=${DB_USER}
@@ -23,7 +22,6 @@ services:
   backend:
     build: .
     environment:
-      # ... (variables de entorno como las tenías)
       - DB_URL=jdbc:mysql://mysql:3306/${DB_NAME}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}

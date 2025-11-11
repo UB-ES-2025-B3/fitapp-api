@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,7 +21,6 @@ import java.security.Principal;
 @RequestMapping("/api/v1/home")
 @RequiredArgsConstructor
 @Tag(name = "Home", description = "Endpoints para la pantalla principal y KPIs del usuario")
-@SecurityRequirement(name = "bearer-jwt")
 public class HomeController {
 
     private final HomeService homeService;
@@ -56,6 +56,7 @@ public class HomeController {
                     )
             }
     )
+    @GetMapping
     public ResponseEntity<HomeKpisTodayResponseDTO> getHomeKpisToday(Principal principal) {
         return ResponseEntity.ok(homeService.getHomeKpisToday(principal.getName()));
     }

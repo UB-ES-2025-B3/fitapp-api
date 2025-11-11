@@ -55,18 +55,19 @@ public class RouteController {
     }
 
     // ---------------------------------------
-    // GET /api/v1/routes
+    // GET /api/v1/routes/{id}
     // ---------------------------------------
     @Operation(
-            summary = "Listar mis rutas activas",
-            description = "Devuelve todas las rutas activas (no eliminadas) asociadas al usuario autenticado.",
+            summary = "Mostrar una ruta por su id",
+            description = "Devuelve la ruta activas (no eliminadas) asociadas al usuario autenticado según la id de la ruta.",
             parameters = {
+                    @Parameter(name="id",hidden = true,description = "Id de la ruta"),
                     @Parameter(name = "principal", hidden = true, description = "Usuario autenticado")
             },
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "Listado de rutas obtenido correctamente",
+                            description = "Ruta obtenida correctamente",
                             content = @Content(
                                     mediaType = "application/json",
                                     schema = @Schema(implementation = RouteResponseDTO.class)

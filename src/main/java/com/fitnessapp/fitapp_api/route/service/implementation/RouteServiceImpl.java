@@ -35,6 +35,14 @@ public class RouteServiceImpl implements RouteService {
     }
 
     @Override
+    public RouteResponseDTO getRouteById(Long id, String email){
+        var route = routeRepository.findByIdAndUserEmail(id, email)
+                .orElseThrow(() -> new RouteNotFoundException("Route not found for id: " + id));
+
+        return mapper.toResponseDto(route);
+    }
+
+    @Override
     public RouteResponseDTO createRoute(String email, RouteRequestDTO toCreate) {
         var userAuth = userAuthRepository.findByEmail(email)
                 .orElseThrow(() -> new UserAuthNotFoundException("User not found for email: " + email));

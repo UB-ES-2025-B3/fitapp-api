@@ -7,6 +7,8 @@ import com.fitnessapp.fitapp_api.home.service.HomeService;
 import com.fitnessapp.fitapp_api.profile.model.UserProfile;
 import com.fitnessapp.fitapp_api.profile.repository.UserProfileRepository;
 import com.fitnessapp.fitapp_api.profile.service.UserProfileService;
+import com.fitnessapp.fitapp_api.route.model.Route;
+import com.fitnessapp.fitapp_api.route.repository.RouteRepository;
 import com.fitnessapp.fitapp_api.routeexecution.model.RouteExecution;
 import com.fitnessapp.fitapp_api.routeexecution.repository.RouteExecutionRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ public class HomeServiceImpl implements HomeService {
     private final UserProfileService userProfileService;
     private final UserProfileRepository userProfileRepository;
     private final RouteExecutionRepository routeExecutionRepository;
+    private final RouteRepository routeRepository;
 
     @Override
     public HomeKpisTodayResponseDTO getHomeKpisToday(String email) {
@@ -32,14 +35,14 @@ public class HomeServiceImpl implements HomeService {
             throw new UserProfileNotCompletedException("User profile is not complete for email: " + email);
         }
 
-        List<RouteExecution> userRoutes = routeExecutionRepository.findAllByUserEmail(email);
-        return calculateKpisForToday(userRoutes);
+        List<RouteExecution> userRoutesExecutions = routeExecutionRepository.findAllByUserEmail(email);
+        return calculateKpisForToday(userRoutesExecutions,email);
     }
 
-    private HomeKpisTodayResponseDTO calculateKpisForToday(List<RouteExecution> routes) {
+    private HomeKpisTodayResponseDTO calculateKpisForToday(List<RouteExecution> routesExecutions,String email) {
         LocalDate today = LocalDate.now();
 
-        List<RouteExecution> todaysCompletedRoutes = routes.stream()
+        List<RouteExecution> todaysCompletedRoutes = routesExecutions.stream()
                 .filter(routeExecution -> routeExecution.getEndTime().toLocalDate().equals(today))
                 .filter(routeExecution -> routeExecution.getStatus() == RouteExecution.RouteExecutionStatus.FINISHED)
                 .toList();
@@ -54,7 +57,11 @@ public class HomeServiceImpl implements HomeService {
                 .mapToDouble(routeExecution -> routeExecution.getCalories().doubleValue())
                 .sum();
 
-        int activeStreak = calculateActiveStreak(routes);
+        int activeStreak = calculateActiveStreak(routesExecutions);
+
+        List<Route> routes = routeRepository.findAllByUserEmail(email).stream()
+                .filter(route -> route.getCreatedAt().toLocalDate().equals(today))
+                .toList();
 
         return new HomeKpisTodayResponseDTO(
                 routesCompleted,

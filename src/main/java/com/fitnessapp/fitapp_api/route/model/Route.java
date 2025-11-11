@@ -2,10 +2,14 @@ package com.fitnessapp.fitapp_api.route.model;
 
 import com.fitnessapp.fitapp_api.auth.model.UserAuth;
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SoftDelete;
 import org.hibernate.annotations.SoftDeleteType;
 import lombok.*;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -40,4 +44,11 @@ public class Route {
     @Column(name = "distance_km", precision = 10, scale = 2)
     private BigDecimal distanceKm;
 
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 }

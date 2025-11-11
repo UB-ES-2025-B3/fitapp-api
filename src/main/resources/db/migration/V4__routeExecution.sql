@@ -1,0 +1,25 @@
+set NAMES utf8mb4;
+
+CREATE TABLE route_executions (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    route_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
+    status ENUM('IN_PROGRESS', 'PAUSED', 'FINISHED') NOT NULL,
+    start_time TIMESTAMP NOT NULL,
+    pause_time TIMESTAMP NULL,
+    end_time TIMESTAMP NULL,
+    total_paused_time_sec BIGINT NOT NULL DEFAULT 0,
+    duration_sec BIGINT NULL,
+    activity_type ENUM('WALKING_SLOW', 'WALKING_MODERATE', 'WALKING_INTENSE', 'RUNNING_SLOW', 'RUNNING_MODERATE', 'RUNNING_INTENSE', 'CYCLING_SLOW', 'CYCLING_MODERATE', 'CYCLING_INTENSE') NULL,
+    calories DECIMAL(10,2) NULL,
+    notes VARCHAR(500) NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_route_execution_route FOREIGN KEY (route_id)
+      REFERENCES routes(id)
+      ON DELETE CASCADE,
+    CONSTRAINT fk_route_execution_user FOREIGN KEY (user_id)
+      REFERENCES user_auth(id)
+      ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

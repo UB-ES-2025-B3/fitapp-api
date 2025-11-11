@@ -64,11 +64,36 @@ public class UserProfileServiceImpl implements UserProfileService {
         // Update fields
         existingProfile.setFirstName(toUpdate.firstName());
         existingProfile.setLastName(toUpdate.lastName());
+        existingProfile.setGender(toUpdate.gender());
         existingProfile.setBirthDate(toUpdate.birthDate());
         existingProfile.setHeightCm(toUpdate.heightCm());
         existingProfile.setWeightKg(toUpdate.weightKg());
+        existingProfile.setTimeZone(toUpdate.timeZone());
 
         UserProfile updatedProfile = repository.save(existingProfile);
         return mapper.toResponseDto(updatedProfile, email);
+    }
+
+    @Override
+    public boolean isProfileComplete(String email) {
+        var profile = repository.findByUser_Email(email)
+                .orElseThrow(() -> new UserProfileNotFoundException(
+                        "Profile not found for: " + email
+                ));
+
+        return profile.getFirstName() != null &&
+                profile.getLastName() != null &&
+                profile.getBirthDate() != null &&
+                profile.getHeightCm() != null &&
+                profile.getWeightKg() != null;
+    }
+
+    @Override
+    public boolean isProfileComplete(UserProfile profile) {
+        return profile.getFirstName() != null &&
+                profile.getLastName() != null &&
+                profile.getBirthDate() != null &&
+                profile.getHeightCm() != null &&
+                profile.getWeightKg() != null;
     }
 }

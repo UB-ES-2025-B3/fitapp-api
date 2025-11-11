@@ -1,9 +1,6 @@
 package com.fitnessapp.fitapp_api.core.handler;
 
-import com.fitnessapp.fitapp_api.core.exception.UserAlreadyExistsException;
-import com.fitnessapp.fitapp_api.core.exception.UserAuthNotFoundException;
-import com.fitnessapp.fitapp_api.core.exception.UserProfileAlreadyExistsException;
-import com.fitnessapp.fitapp_api.core.exception.UserProfileNotFoundException;
+import com.fitnessapp.fitapp_api.core.exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -209,5 +206,32 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         };
         return errorFactory.entity(status, code,
                 ex.getReason() != null ? ex.getReason() : "Error", req.getRequestURI(), Map.of());
+    }
+
+    /**
+     * 404 - Ruta no encontrada
+     */
+    @ExceptionHandler(RouteNotFoundException.class)
+    public ResponseEntity<Object> handleRouteNotFound(RouteNotFoundException ex, HttpServletRequest req) {
+        return errorFactory.entity(HttpStatus.NOT_FOUND, "route_not_found",
+                ex.getMessage(), req.getRequestURI(), Map.of());
+    }
+
+    /**
+     * 404 - Ejecucion de ruta no encontrada
+     */
+    @ExceptionHandler(RouteExecutionNotFoundException.class)
+    public ResponseEntity<Object> handleRouteExecutionNotFound(RouteExecutionNotFoundException ex, HttpServletRequest req) {
+        return errorFactory.entity(HttpStatus.NOT_FOUND, "route_execution_not_found",
+                ex.getMessage(), req.getRequestURI(), Map.of());
+    }
+
+    /**
+     * 422 - Perfil de usuario incompleto
+     */
+    @ExceptionHandler(UserProfileNotCompletedException.class)
+    public ResponseEntity<Object> handleUserProfileNotCompleted(UserProfileNotCompletedException ex, HttpServletRequest req) {
+        return errorFactory.entity(HttpStatus.UNPROCESSABLE_ENTITY, "user_profile_not_completed",
+                ex.getMessage(), req.getRequestURI(), Map.of());
     }
 }

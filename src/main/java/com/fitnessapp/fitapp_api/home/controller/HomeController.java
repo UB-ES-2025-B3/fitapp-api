@@ -55,7 +55,7 @@ public class HomeController {
                     )
             }
     )
-    @GetMapping
+    @GetMapping("/kpis/today")
     public ResponseEntity<HomeKpisTodayResponseDTO> getHomeKpisToday(Principal principal) {
         return ResponseEntity.ok(homeService.getHomeKpisToday(principal.getName()));
     }

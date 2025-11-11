@@ -16,7 +16,7 @@ public record HomeKpisTodayResponseDTO(
                 example = "12.0") double totalDistanceKmToday,
         @Schema(
                 description = "Calorías quemadas hoy",
-                example = "340") int caloriesKcalToday,
+                example = "340.9") double caloriesKcalToday,
         @Schema(
                 description = "Número de días consecutivos con actividad",
                 example = "4") int activeStreakDays,

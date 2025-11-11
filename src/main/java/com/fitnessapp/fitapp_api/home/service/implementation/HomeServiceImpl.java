@@ -7,8 +7,14 @@ import com.fitnessapp.fitapp_api.home.service.HomeService;
 import com.fitnessapp.fitapp_api.profile.model.UserProfile;
 import com.fitnessapp.fitapp_api.profile.repository.UserProfileRepository;
 import com.fitnessapp.fitapp_api.profile.service.UserProfileService;
+import com.fitnessapp.fitapp_api.routeexecution.model.RouteExecution;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,31 +31,57 @@ public class HomeServiceImpl implements HomeService {
             throw new UserProfileNotCompletedException("User profile is not complete for email: " + email);
         }
 
-        int mockRoutesCompleted = 2;
-        long mockTotalDuration = 2712L; // 45 min, 12 seg
-        double mockTotalDistance = 6.3;
-        int mockCaloriesToday = 340;
-        int mockActiveStreak = 3;
-        boolean mockHasCreatedRoutes = true; // Para el estado vacío de "Crear tu primera ruta"
+        List<RouteExecution> userRoutes = new ArrayList<>(); // Placeholder para luego colocar el verdadero get
+        // List<RouteExecution> userRoutes = routeExecutionRepository.findAllByUserEmail(email);
+        return calculateKpisForToday(userRoutes);
+    }
 
-        // 3. Devolver el DTO con los datos (mock por ahora)
+    public HomeKpisTodayResponseDTO calculateKpisForToday(List<RouteExecution> routes) {
+        LocalDate today = LocalDate.now();
+
+        List<RouteExecution> todaysCompletedRoutes = routes.stream()
+                .filter(routeExecution -> routeExecution.getEndTime().toLocalDate().equals(today))
+                .filter(routeExecution -> routeExecution.getStatus() == RouteExecution.RouteExecutionStatus.FINISHED)
+                .toList();
+        int routesCompleted = todaysCompletedRoutes.size();
+        long totalDurationSec = todaysCompletedRoutes.stream()
+                .mapToLong(RouteExecution::getDurationSec)
+                .sum();
+        double totalDistanceKm = todaysCompletedRoutes.stream()
+                .mapToDouble(routeExecution -> routeExecution.getRoute().getDistanceKm().doubleValue())
+                .sum();
+        double totalCalories = todaysCompletedRoutes.stream()
+                .mapToDouble(routeExecution -> routeExecution.getCalories().doubleValue())
+                .sum();
+
+        int activeStreak = calculateActiveStreak(routes);
+
         return new HomeKpisTodayResponseDTO(
-                mockRoutesCompleted,
-                mockTotalDuration,
-                mockTotalDistance,
-                mockCaloriesToday,
-                mockActiveStreak,
-                mockHasCreatedRoutes
+                routesCompleted,
+                totalDurationSec,
+                totalDistanceKm,
+                totalCalories,
+                activeStreak,
+                !routes.isEmpty()
         );
     }
 
-    private int calculateRoutesCompletedToday(UserProfile profile) {
-        // Lógica para calcular las rutas completadas hoy basadas en el perfil del usuario
-        return 0; // Mock
-    }
+    public int calculateActiveStreak(List<RouteExecution> completedRoutes) {
+        List<LocalDate> completionDates = completedRoutes.stream()
+                .map(routeExecution -> routeExecution.getEndTime().toLocalDate())
+                .distinct()
+                .sorted(Comparator.reverseOrder())
+                .toList();
 
-    private int calculateActiveStreak(UserProfile profile) {
-        // Lógica para calcular la racha activa basada en el perfil del usuario
-        return 0; // Mock
+        LocalDate today = LocalDate.now();
+        int streak = 0;
+        for (LocalDate date : completionDates) {
+            if (date.equals(today.minusDays(streak))) {
+                streak++;
+            } else {
+                break;
+            }
+        }
+        return streak;
     }
 }

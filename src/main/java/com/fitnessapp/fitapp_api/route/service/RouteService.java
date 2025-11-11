@@ -10,6 +10,9 @@ public interface RouteService {
     // para obtener todas las rutas activas (no eliminadas) del usuario autenticado
     List<RouteResponseDTO> getMyRoutes(String email);
 
+    // Para obtener una ruta por su identificador.
+    RouteResponseDTO getRouteById(Long id, String email);
+
     // para crear una nueva ruta
     RouteResponseDTO createRoute(String email, RouteRequestDTO toCreate);
 

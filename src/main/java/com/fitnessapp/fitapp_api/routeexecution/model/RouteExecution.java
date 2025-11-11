@@ -81,8 +81,14 @@ public class RouteExecution {
     }
 
     public enum ActivityType {
-        WALK,
-        RUN,
-        BIKE
+        WALKING_SLOW,
+        WALKING_MODERATE,
+        WALKING_INTENSE,
+        RUNNING_SLOW,
+        RUNNING_MODERATE,
+        RUNNING_INTENSE,
+        CYCLING_SLOW,
+        CYCLING_MODERATE,
+        CYCLING_INTENSE;
     }
 }

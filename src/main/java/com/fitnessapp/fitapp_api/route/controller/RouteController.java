@@ -55,6 +55,35 @@ public class RouteController {
     }
 
     // ---------------------------------------
+    // GET /api/v1/routes/{id}
+    // ---------------------------------------
+    @Operation(
+            summary = "Mostrar una ruta por su id",
+            description = "Devuelve la ruta activas (no eliminadas) asociadas al usuario autenticado según la id de la ruta.",
+            parameters = {
+                    @Parameter(name="id",hidden = true,description = "Id de la ruta"),
+                    @Parameter(name = "principal", hidden = true, description = "Usuario autenticado")
+            },
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Ruta obtenida correctamente",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = RouteResponseDTO.class)
+                            )
+                    ),
+                    @ApiResponse(responseCode = "401", description = "No autorizado", content = @Content)
+            }
+    )
+    @GetMapping("/{id}")
+    public ResponseEntity<RouteResponseDTO> getRouteById(@PathVariable Long id
+                                                                ,Principal principal) {
+        RouteResponseDTO route = service.getRouteById(id,principal.getName());
+        return ResponseEntity.ok(route);
+    }
+
+    // ---------------------------------------
     // POST /api/v1/routes
     // ---------------------------------------
     @Operation(

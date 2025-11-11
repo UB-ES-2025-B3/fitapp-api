@@ -1,5 +1,6 @@
 package com.fitnessapp.fitapp_api.calories.service.implementation;
 
+import com.fitnessapp.fitapp_api.calories.service.CalorieCalculationService;
 import com.fitnessapp.fitapp_api.calories.service.dto.CCActivityRequest;
 import com.fitnessapp.fitapp_api.core.exception.UserProfileNotCompletedException;
 import com.fitnessapp.fitapp_api.profile.model.UserProfile;
@@ -12,7 +13,7 @@ import java.time.Period;
 
 @Service
 @RequiredArgsConstructor
-public class CalorieCalculationServiceImpl {
+public class CalorieCalculationServiceImpl implements CalorieCalculationService {
     private final UserProfileService userProfileService;
 
     public double calculateCalories(UserProfile profile, CCActivityRequest activity) {

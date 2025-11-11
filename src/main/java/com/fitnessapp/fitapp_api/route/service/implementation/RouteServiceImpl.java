@@ -9,6 +9,7 @@ import com.fitnessapp.fitapp_api.route.mapper.RouteMapper;
 import com.fitnessapp.fitapp_api.route.model.Route;
 import com.fitnessapp.fitapp_api.route.repository.RouteRepository;
 import com.fitnessapp.fitapp_api.route.service.RouteService;
+import com.fitnessapp.fitapp_api.routeexecution.repository.RouteExecutionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class RouteServiceImpl implements RouteService {
 
     private final RouteRepository routeRepository;
     private final UserAuthRepository userAuthRepository;
+    private final RouteExecutionRepository routeExecutionRepository;
     @Qualifier("routeMapper")
     private final RouteMapper mapper;
 
@@ -69,9 +71,7 @@ public class RouteServiceImpl implements RouteService {
         var route = routeRepository.findByIdAndUserEmail(id, email)
                 .orElseThrow(() -> new RouteNotFoundException("Route not found for id: " + id));
 
-        // pendiente de implementacion de RouteExecution
-        // boolean hasExecutions = routeExecutionRepository.existsRouteExecutionByRouteId(route.getId());
-        boolean hasExecutions = false;
+        boolean hasExecutions = routeExecutionRepository.existsByRouteId(route.getId());
 
         if (hasExecutions) {
             // Soft delete

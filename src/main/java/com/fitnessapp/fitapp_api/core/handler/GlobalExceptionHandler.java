@@ -216,4 +216,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return errorFactory.entity(HttpStatus.NOT_FOUND, "route_not_found",
                 ex.getMessage(), req.getRequestURI(), Map.of());
     }
+
+    /**
+     * 404 - Ejecucion de ruta no encontrada
+     */
+    @ExceptionHandler(RouteExecutionNotFoundException.class)
+    public ResponseEntity<Object> handleRouteExecutionNotFound(RouteExecutionNotFoundException ex, HttpServletRequest req) {
+        return errorFactory.entity(HttpStatus.NOT_FOUND, "route_execution_not_found",
+                ex.getMessage(), req.getRequestURI(), Map.of());
+    }
 }

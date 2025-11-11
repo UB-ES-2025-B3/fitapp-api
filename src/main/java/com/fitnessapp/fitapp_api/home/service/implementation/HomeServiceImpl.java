@@ -8,11 +8,11 @@ import com.fitnessapp.fitapp_api.profile.model.UserProfile;
 import com.fitnessapp.fitapp_api.profile.repository.UserProfileRepository;
 import com.fitnessapp.fitapp_api.profile.service.UserProfileService;
 import com.fitnessapp.fitapp_api.routeexecution.model.RouteExecution;
+import com.fitnessapp.fitapp_api.routeexecution.repository.RouteExecutionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -21,6 +21,7 @@ import java.util.List;
 public class HomeServiceImpl implements HomeService {
     private final UserProfileService userProfileService;
     private final UserProfileRepository userProfileRepository;
+    private final RouteExecutionRepository routeExecutionRepository;
 
     @Override
     public HomeKpisTodayResponseDTO getHomeKpisToday(String email) {
@@ -31,12 +32,11 @@ public class HomeServiceImpl implements HomeService {
             throw new UserProfileNotCompletedException("User profile is not complete for email: " + email);
         }
 
-        List<RouteExecution> userRoutes = new ArrayList<>(); // Placeholder para luego colocar el verdadero get
-        // List<RouteExecution> userRoutes = routeExecutionRepository.findAllByUserEmail(email);
+        List<RouteExecution> userRoutes = routeExecutionRepository.findAllByUserEmail(email);
         return calculateKpisForToday(userRoutes);
     }
 
-    public HomeKpisTodayResponseDTO calculateKpisForToday(List<RouteExecution> routes) {
+    private HomeKpisTodayResponseDTO calculateKpisForToday(List<RouteExecution> routes) {
         LocalDate today = LocalDate.now();
 
         List<RouteExecution> todaysCompletedRoutes = routes.stream()
@@ -66,8 +66,9 @@ public class HomeServiceImpl implements HomeService {
         );
     }
 
-    public int calculateActiveStreak(List<RouteExecution> completedRoutes) {
+    private int calculateActiveStreak(List<RouteExecution> completedRoutes) {
         List<LocalDate> completionDates = completedRoutes.stream()
+                .filter(routeExecution -> routeExecution.getStatus() == RouteExecution.RouteExecutionStatus.FINISHED)
                 .map(routeExecution -> routeExecution.getEndTime().toLocalDate())
                 .distinct()
                 .sorted(Comparator.reverseOrder())

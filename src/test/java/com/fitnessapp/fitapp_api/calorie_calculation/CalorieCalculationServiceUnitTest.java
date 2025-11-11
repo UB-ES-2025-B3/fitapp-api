@@ -6,14 +6,14 @@ import com.fitnessapp.fitapp_api.calories.service.implementation.CalorieCalculat
 import com.fitnessapp.fitapp_api.core.exception.UserProfileNotCompletedException;
 import com.fitnessapp.fitapp_api.profile.model.UserProfile;
 import com.fitnessapp.fitapp_api.profile.service.UserProfileService;
+import com.fitnessapp.fitapp_api.profile.util.Gender;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import com.fitnessapp.fitapp_api.profile.util.Gender;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -26,16 +26,13 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class CalorieCalculationServiceUnitTest {
 
+    private static final double DELTA = 1e-4;
     @Mock
     UserProfileService userProfileService;
-
     @Mock
     UserProfile userProfile;
-
     @InjectMocks
     CalorieCalculationServiceImpl service;
-
-    private static final double DELTA = 1e-4;
 
     @BeforeEach
     void setUp() {

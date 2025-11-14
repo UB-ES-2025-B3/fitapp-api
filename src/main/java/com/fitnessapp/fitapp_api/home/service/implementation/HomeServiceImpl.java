@@ -43,8 +43,10 @@ public class HomeServiceImpl implements HomeService {
         LocalDate today = LocalDate.now();
 
         List<RouteExecution> todaysCompletedRoutes = routesExecutions.stream()
-                .filter(routeExecution -> routeExecution.getEndTime().toLocalDate().equals(today))
+                // 1. Filtrar por estado FINALIZADO primero
                 .filter(routeExecution -> routeExecution.getStatus() == RouteExecution.RouteExecutionStatus.FINISHED)
+                // 2. Ahora es seguro llamar a getEndTime(), porque las rutas finalizadas lo tienen
+                .filter(routeExecution -> routeExecution.getEndTime().toLocalDate().equals(today))
                 .toList();
         int routesCompleted = todaysCompletedRoutes.size();
         long totalDurationSec = todaysCompletedRoutes.stream()
@@ -54,6 +56,9 @@ public class HomeServiceImpl implements HomeService {
                 .mapToDouble(routeExecution -> routeExecution.getRoute().getDistanceKm().doubleValue())
                 .sum();
         double totalCalories = todaysCompletedRoutes.stream()
+                // 1. Asegurarse de que las calorías no sean nulas antes de sumar
+                .filter(routeExecution -> routeExecution.getCalories() != null)
+                // 2. Ahora es seguro llamar a .doubleValue()
                 .mapToDouble(routeExecution -> routeExecution.getCalories().doubleValue())
                 .sum();
 

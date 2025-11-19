@@ -1,6 +1,7 @@
 package com.fitnessapp.fitapp_api.routeexecution.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
 
@@ -38,25 +39,28 @@ public record RouteExecutionResponseDTO(
                 description = "Fecha y hora de inicio de la ejecución",
                 example = "2025-11-11T08:30:00"
         )
+        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") // [Modificado] Asegura formato String ISO
         LocalDateTime startTime,
 
         @Schema(
                 description = "Fecha y hora de la última pausa (si está pausada)",
                 example = "2025-11-11T08:45:00"
         )
+        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") // [Modificado] Asegura formato String ISO
         LocalDateTime pauseTime,
 
         @Schema(
                 description = "Fecha y hora de finalización",
                 example = "2025-11-11T09:30:00"
         )
+        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") // [Modificado] Asegura formato String ISO
         LocalDateTime endTime,
 
         @Schema(
                 description = "Tiempo total en segundos que la ejecución estuvo pausada",
                 example = "300"
         )
-        Long totalPausedTime,
+        Long totalPausedTimeSec,
 
         @Schema(
                 description = "Duración total de la ruta en segundos (hora_fin - hora_inicio - tiempo_pausado_total)",

@@ -2,8 +2,10 @@ package com.fitnessapp.fitapp_api.routeexecution.service.implementation;
 
 import com.fitnessapp.fitapp_api.calories.service.CalorieCalculationService;
 import com.fitnessapp.fitapp_api.calories.service.dto.CCActivityRequest;
+import com.fitnessapp.fitapp_api.core.exception.RouteExecutionNotFoundException;
 import com.fitnessapp.fitapp_api.core.exception.RouteNotFoundException;
 import com.fitnessapp.fitapp_api.core.exception.UserAuthNotFoundException;
+import com.fitnessapp.fitapp_api.core.exception.UserProfileNotCompletedException;
 import com.fitnessapp.fitapp_api.routeexecution.dto.RouteExecutionRequestDTO;
 import com.fitnessapp.fitapp_api.routeexecution.dto.RouteExecutionResponseDTO;
 import com.fitnessapp.fitapp_api.routeexecution.mapper.RouteExecutionMapper;
@@ -18,6 +20,7 @@ import com.fitnessapp.fitapp_api.auth.model.UserAuth;
 import com.fitnessapp.fitapp_api.auth.repository.UserAuthRepository;
 import com.fitnessapp.fitapp_api.routeexecution.service.RouteExecutionService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +29,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -74,6 +78,7 @@ public class RouteExecutionServiceImpl implements RouteExecutionService {
 
         if (exec.getStatus() != RouteExecutionStatus.IN_PROGRESS) {
             // Si no está en curso no podemos pausar; lanzar IllegalState o similar
+            if (exec.getStatus() == RouteExecutionStatus.PAUSED) return mapper.toResponseDto(exec);
             throw new IllegalStateException("Execution is not in progress and cannot be paused");
         }
 
@@ -94,20 +99,22 @@ public class RouteExecutionServiceImpl implements RouteExecutionService {
                         "Execution not found for id: " + executionId));
 
         if (exec.getStatus() != RouteExecutionStatus.PAUSED) {
+            if (exec.getStatus() == RouteExecutionStatus.IN_PROGRESS) return mapper.toResponseDto(exec);
             throw new IllegalStateException("Execution is not paused and cannot be resumed");
         }
 
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime pauseTime = exec.getPauseTime();
-        if (pauseTime == null) {
-            throw new IllegalStateException("pauseTime is missing");
+        // Protección contra NullPointer si los datos vinieron corruptos
+        if (pauseTime != null) {
+            long pausedSec = Duration.between(pauseTime, now).toSeconds();
+            // [MODIFICADO] Evitar tiempos negativos si el reloj del servidor se desajusta
+            pausedSec = Math.max(0, pausedSec);
+
+            Long prevTotalPaused = exec.getTotalPausedTimeSec() != null ? exec.getTotalPausedTimeSec() : 0L;
+            exec.setTotalPausedTimeSec(prevTotalPaused + pausedSec);
         }
 
-        long pausedSec = Duration.between(pauseTime, now).toSeconds();
-        Long prevTotalPaused = exec.getTotalPausedTimeSec() != null ? exec.getTotalPausedTimeSec() : 0L;
-        exec.setTotalPausedTimeSec(prevTotalPaused + pausedSec);
-
-        // clear pauseTime and set status/start continue
         exec.setPauseTime(null);
         exec.setStatus(RouteExecutionStatus.IN_PROGRESS);
 
@@ -124,14 +131,16 @@ public class RouteExecutionServiceImpl implements RouteExecutionService {
                         "Execution not found for id : " + executionId));
 
         if (exec.getStatus() == RouteExecutionStatus.FINISHED) {
-            throw new IllegalStateException("Execution already finished");
+            // Si ya estaba finalizada, devolver ok en lugar de error
+            return mapper.toResponseDto(exec);
         }
 
         // si estaba pausada, acumular tiempo desde pause hasta now
         if (exec.getStatus() == RouteExecutionStatus.PAUSED && exec.getPauseTime() != null) {
             long pausedSec = Duration.between(exec.getPauseTime(), LocalDateTime.now()).toSeconds();
             Long prevTotal = exec.getTotalPausedTimeSec() != null ? exec.getTotalPausedTimeSec() : 0L;
-            exec.setTotalPausedTimeSec(prevTotal + pausedSec);
+            // Protección contra negativos
+            exec.setTotalPausedTimeSec(prevTotal + Math.max(0, pausedSec));
             exec.setPauseTime(null);
         }
 
@@ -142,8 +151,11 @@ public class RouteExecutionServiceImpl implements RouteExecutionService {
         if (exec.getStartTime() != null && exec.getEndTime() != null) {
             long totalSec = Duration.between(exec.getStartTime(), exec.getEndTime()).toSeconds();
             long paused = exec.getTotalPausedTimeSec() != null ? exec.getTotalPausedTimeSec() : 0L;
+            // Math.max para asegurar duración >= 0
             long durationSec = Math.max(0L, totalSec - paused);
             exec.setDurationSec(durationSec);
+        } else {
+            exec.setDurationSec(0L);
         }
 
         // activityType could come from finish request (override) or existing execution
@@ -152,26 +164,46 @@ public class RouteExecutionServiceImpl implements RouteExecutionService {
         }
         exec.setNotes(request.notes());
 
-        // calcular calorías si hay perfil completo y duration > 0
-        if (exec.getDurationSec() != null && exec.getDurationSec() > 0) {
-            // obtener perfil del usuario
-            UserProfile profile = userProfileRepository.findByUser_Email(email)
-                    .orElse(null);
-
-            if (profile != null) {
-                CCActivityRequest ccRequest = new CCActivityRequest(exec.getActivityType().toString(), exec.getDurationSec());
-                double calories = calorieCalculationService.calculateCalories(profile, ccRequest);
-                exec.setCalories(BigDecimal.valueOf(calories));
-            } else {
-                // perfil no encontrado: dejar calories a null o 0 según convención
-                exec.setCalories(BigDecimal.ZERO);
-            }
-        } else {
-            exec.setCalories(BigDecimal.ZERO);
-        }
+        // Método seguro para calcular calorías sin romper la transacción
+        calculateAndSetCaloriesSafe(email, exec);
 
         RouteExecution saved = executionRepository.save(exec);
         return mapper.toResponseDto(saved);
+    }
+
+    /**
+     * Nuevo método helper para blindar el cálculo de calorías
+     */
+    private void calculateAndSetCaloriesSafe(String email, RouteExecution exec) {
+        if (exec.getDurationSec() == null || exec.getDurationSec() <= 0) {
+            exec.setCalories(BigDecimal.ZERO);
+            return;
+        }
+
+        try {
+            UserProfile profile = userProfileRepository.findByUser_Email(email).orElse(null);
+
+            if (profile != null) {
+                // Fallback a WALKING_MODERATE si no hay actividad definida
+                String activityStr = exec.getActivityType() != null ? exec.getActivityType().toString() : "WALKING_MODERATE";
+
+                CCActivityRequest ccRequest = new CCActivityRequest(activityStr, exec.getDurationSec());
+
+                double calories = calorieCalculationService.calculateCalories(profile, ccRequest);
+                exec.setCalories(BigDecimal.valueOf(calories));
+            } else {
+                log.warn("No calorie calculation: User profile not found for email {}", email);
+                exec.setCalories(BigDecimal.ZERO);
+            }
+        } catch (UserProfileNotCompletedException | IllegalArgumentException e) {
+            // Atrapamos excepciones de negocio esperadas (perfil incompleto)
+            log.warn("Cannot calculate calories for execution {}: {}", exec.getId(), e.getMessage());
+            exec.setCalories(BigDecimal.ZERO);
+        } catch (Exception e) {
+            // Atrapamos cualquier otro error inesperado
+            log.error("Unexpected error calculating calories for execution {}", exec.getId(), e);
+            exec.setCalories(BigDecimal.ZERO);
+        }
     }
 
     /**
@@ -183,5 +215,12 @@ public class RouteExecutionServiceImpl implements RouteExecutionService {
                 .stream()
                 .map(mapper::toResponseDto)
                 .toList();
+    }
+
+    // Método helper para evitar duplicar el .findById...orElseThrow
+    private RouteExecution getExecutionOrThrow(Long id, String email) {
+        return executionRepository.findByIdAndUserEmail(id, email)
+                .orElseThrow(() -> new RouteExecutionNotFoundException(
+                        "Execution not found for id: " + id));
     }
 }

@@ -28,7 +28,7 @@ public class RouteController {
     private final RouteService service;
 
     // ---------------------------------------
-    // GET /api/v1/routes
+    // GET /api/v1/routes/me
     // ---------------------------------------
     @Operation(
             summary = "Listar mis rutas activas",
@@ -48,14 +48,14 @@ public class RouteController {
                     @ApiResponse(responseCode = "401", description = "No autorizado", content = @Content)
             }
     )
-    @GetMapping
+    @GetMapping("/me")
     public ResponseEntity<List<RouteResponseDTO>> getMyRoutes(Principal principal) {
         List<RouteResponseDTO> routes = service.getMyRoutes(principal.getName());
         return ResponseEntity.ok(routes);
     }
 
     // ---------------------------------------
-    // GET /api/v1/routes/{id}
+    // GET /api/v1/routes/me/{id}
     // ---------------------------------------
     @Operation(
             summary = "Mostrar una ruta por su id",
@@ -76,7 +76,7 @@ public class RouteController {
                     @ApiResponse(responseCode = "401", description = "No autorizado", content = @Content)
             }
     )
-    @GetMapping("/{id}")
+    @GetMapping("/me/{id}")
     public ResponseEntity<RouteResponseDTO> getRouteById(@PathVariable Long id
                                                                 ,Principal principal) {
         RouteResponseDTO route = service.getRouteById(id,principal.getName());
@@ -84,7 +84,7 @@ public class RouteController {
     }
 
     // ---------------------------------------
-    // POST /api/v1/routes
+    // POST /api/v1/routes/me
     // ---------------------------------------
     @Operation(
             summary = "Crear nueva ruta",
@@ -118,7 +118,7 @@ public class RouteController {
                     )
             }
     )
-    @PostMapping
+    @PostMapping("/me")
     public ResponseEntity<RouteResponseDTO> createRoute(Principal principal, @Valid @RequestBody RouteRequestDTO body) {
         RouteResponseDTO created = service.createRoute(principal.getName(), body);
         URI location = ServletUriComponentsBuilder
@@ -130,7 +130,7 @@ public class RouteController {
     }
 
     // ---------------------------------------
-    // PUT /api/v1/routes/{id}
+    // PUT /api/v1/routes/me/{id}
     // ---------------------------------------
     @Operation(
             summary = "Actualizar una ruta existente",
@@ -157,7 +157,7 @@ public class RouteController {
                     @ApiResponse(responseCode = "401", description = "No autorizado", content = @Content(mediaType = "application/json"))
             }
     )
-    @PutMapping("/{id}")
+    @PutMapping("/me/{id}")
     public ResponseEntity<RouteResponseDTO> updateRoute(
             Principal principal,
             @PathVariable Long id,
@@ -168,7 +168,7 @@ public class RouteController {
     }
 
     // ---------------------------------------
-    // DELETE /api/v1/routes/{id}
+    // DELETE /api/v1/routes/me/{id}
     // ---------------------------------------
     @Operation(
             summary = "Eliminar una ruta",
@@ -179,7 +179,7 @@ public class RouteController {
                     @ApiResponse(responseCode = "401", description = "No autorizado", content = @Content(mediaType = "application/json"))
             }
     )
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/me/{id}")
     public ResponseEntity<Void> deleteRoute(Principal principal, @PathVariable Long id) {
         service.deleteRoute(principal.getName(), id);
         return ResponseEntity.noContent().build();

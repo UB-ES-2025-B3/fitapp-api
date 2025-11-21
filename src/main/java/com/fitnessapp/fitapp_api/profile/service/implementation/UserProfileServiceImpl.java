@@ -69,6 +69,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         existingProfile.setHeightCm(toUpdate.heightCm());
         existingProfile.setWeightKg(toUpdate.weightKg());
         existingProfile.setTimeZone(toUpdate.timeZone());
+        existingProfile.setGoalKcalDaily(toUpdate.goalKcalDaily());
 
         UserProfile updatedProfile = repository.save(existingProfile);
         return mapper.toResponseDto(updatedProfile, email);

@@ -55,4 +55,7 @@ public class UserProfile {
     @Column(name = "points", nullable = false)
     private Long points = 0L;
 
+    @Column(name = "goal_kcal_daily")
+    private Integer goalKcalDaily;
+
 }

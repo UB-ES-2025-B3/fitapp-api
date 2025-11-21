@@ -52,4 +52,7 @@ public class UserProfile {
     @Column(name = "time_zone", length = 50)
     private ZoneId timeZone;
 
+    @Column(name = "points", nullable = false)
+    private Long points = 0L;
+
 }

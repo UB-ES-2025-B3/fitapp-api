@@ -14,6 +14,7 @@ public record UserProfileResponseDTO(
         LocalDate birthDate,
         BigDecimal heightCm,
         BigDecimal weightKg,
-        ZoneId timeZone
+        ZoneId timeZone,
+        Long points
 ) {
 }

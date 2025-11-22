@@ -1,4 +1,4 @@
-package com.fitnessapp.fitapp_api.userprofile_points;
+package com.fitnessapp.fitapp_api.userprofile;
 
 import com.fitnessapp.fitapp_api.auth.model.UserAuth;
 import com.fitnessapp.fitapp_api.auth.repository.UserAuthRepository;

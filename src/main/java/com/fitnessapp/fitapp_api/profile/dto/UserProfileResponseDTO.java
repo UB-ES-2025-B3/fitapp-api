@@ -15,6 +15,7 @@ public record UserProfileResponseDTO(
         BigDecimal heightCm,
         BigDecimal weightKg,
         ZoneId timeZone,
-        Long points
+        Long points,
+        Integer goalKcalDaily
 ) {
 }

@@ -11,6 +11,7 @@ import com.fitnessapp.fitapp_api.profile.model.UserProfile;
 import com.fitnessapp.fitapp_api.profile.repository.UserProfileRepository;
 import com.fitnessapp.fitapp_api.profile.service.UserProfileService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     private final UserProfileRepository repository;
     private final UserAuthRepository userAuthRepository;
+    @Qualifier("userProfileMapperImpl")
     private final UserProfileMapper mapper;
 
     @Override
@@ -69,6 +71,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         existingProfile.setHeightCm(toUpdate.heightCm());
         existingProfile.setWeightKg(toUpdate.weightKg());
         existingProfile.setTimeZone(toUpdate.timeZone());
+        existingProfile.setGoalKcalDaily(toUpdate.goalKcalDaily());
 
         UserProfile updatedProfile = repository.save(existingProfile);
         return mapper.toResponseDto(updatedProfile, email);

@@ -22,5 +22,8 @@ public record HomeKpisTodayResponseDTO(
                 example = "4") int activeStreakDays,
         @Schema(
                 description = "Indica si el usuario ha creado alguna ruta",
-                example = "true") boolean hasCreatedRoutes
+                example = "true") boolean hasCreatedRoutes,
+        @Schema(
+                description = "Objetivo diario de calorías del usuario",
+                example = "2000") int goalKcalDaily
 ) {}

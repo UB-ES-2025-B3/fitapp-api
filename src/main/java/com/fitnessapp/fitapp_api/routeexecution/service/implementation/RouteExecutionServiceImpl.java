@@ -99,7 +99,6 @@ public class RouteExecutionServiceImpl implements RouteExecutionService {
                         "Execution not found for id: " + executionId));
 
         if (exec.getStatus() != RouteExecutionStatus.PAUSED) {
-            if (exec.getStatus() == RouteExecutionStatus.IN_PROGRESS) return mapper.toResponseDto(exec);
             throw new IllegalStateException("Execution is not paused and cannot be resumed");
         }
 

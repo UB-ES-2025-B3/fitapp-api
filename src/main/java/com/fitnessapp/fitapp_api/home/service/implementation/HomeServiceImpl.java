@@ -38,10 +38,10 @@ public class HomeServiceImpl implements HomeService {
         }
 
         List<RouteExecution> userRoutesExecutions = routeExecutionRepository.findAllByUserEmail(email);
-        return calculateKpisForToday(userRoutesExecutions,email);
+        return calculateKpisForToday(userRoutesExecutions,email, profile);
     }
 
-    private HomeKpisTodayResponseDTO calculateKpisForToday(List<RouteExecution> routesExecutions,String email) {
+    private HomeKpisTodayResponseDTO calculateKpisForToday(List<RouteExecution> routesExecutions,String email,UserProfile profile) {
         LocalDate today = LocalDate.now();
 
         List<RouteExecution> todaysCompletedRoutes = routesExecutions.stream()
@@ -74,8 +74,6 @@ public class HomeServiceImpl implements HomeService {
                 today.atTime(LocalTime.MAX)
         );
 
-        UserProfile profile = userProfileRepository.findByUser_Email(email)
-                .orElseThrow(() -> new UserProfileNotFoundException("User profile not found for email: " + email));
         int goalKcalDaily = profile.getGoalKcalDaily();
 
         return new HomeKpisTodayResponseDTO(

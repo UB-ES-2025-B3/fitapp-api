@@ -9,6 +9,7 @@ import com.fitnessapp.fitapp_api.profile.model.UserProfile;
 import com.fitnessapp.fitapp_api.profile.repository.UserProfileRepository;
 import com.fitnessapp.fitapp_api.profile.service.UserProfileService;
 import com.fitnessapp.fitapp_api.route.model.Route;
+import com.fitnessapp.fitapp_api.route.repository.RouteRepository;
 import com.fitnessapp.fitapp_api.routeexecution.model.RouteExecution;
 import com.fitnessapp.fitapp_api.routeexecution.repository.RouteExecutionRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +41,9 @@ class HomeServiceUnitTests {
     @Mock
     private RouteExecutionRepository routeExecutionRepository;
 
+    @Mock
+    private RouteRepository routeRepository;
+
     @InjectMocks
     private HomeServiceImpl homeService;
 
@@ -57,6 +61,7 @@ class HomeServiceUnitTests {
         testProfile = new UserProfile();
         testProfile.setUser(testUser);
         testProfile.setId(1L);
+        testProfile.setGoalKcalDaily(0);
     }
 
     // ========================================
@@ -148,6 +153,11 @@ class HomeServiceUnitTests {
                 .thenReturn(true);
         when(routeExecutionRepository.findAllByUserEmail(testEmail))
                 .thenReturn(routeExecutions);
+        when(routeRepository.existsByUser_EmailAndCreatedAtBetween(
+                eq(testEmail),
+                any(),
+                any()
+        )).thenReturn(true);
 
         // Act
         HomeKpisTodayResponseDTO result = homeService.getHomeKpisToday(testEmail);
@@ -179,6 +189,11 @@ class HomeServiceUnitTests {
                 .thenReturn(true);
         when(routeExecutionRepository.findAllByUserEmail(testEmail))
                 .thenReturn(routeExecutions);
+        when(routeRepository.existsByUser_EmailAndCreatedAtBetween(
+                eq(testEmail),
+                any(),
+                any()
+        )).thenReturn(true);
 
         // Act
         HomeKpisTodayResponseDTO result = homeService.getHomeKpisToday(testEmail);
@@ -242,6 +257,11 @@ class HomeServiceUnitTests {
                 .thenReturn(true);
         when(routeExecutionRepository.findAllByUserEmail(testEmail))
                 .thenReturn(routeExecutions);
+        when(routeRepository.existsByUser_EmailAndCreatedAtBetween(
+                eq(testEmail),
+                any(),
+                any()
+        )).thenReturn(true);
 
         // Act
         HomeKpisTodayResponseDTO result = homeService.getHomeKpisToday(testEmail);
@@ -501,6 +521,11 @@ class HomeServiceUnitTests {
                 .thenReturn(true);
         when(routeExecutionRepository.findAllByUserEmail(testEmail))
                 .thenReturn(routeExecutions);
+        when(routeRepository.existsByUser_EmailAndCreatedAtBetween(
+                eq(testEmail),
+                any(),
+                any()
+        )).thenReturn(true);
 
         // Act
         HomeKpisTodayResponseDTO result = homeService.getHomeKpisToday(testEmail);
@@ -527,6 +552,11 @@ class HomeServiceUnitTests {
                 .thenReturn(true);
         when(routeExecutionRepository.findAllByUserEmail(testEmail))
                 .thenReturn(routeExecutions);
+        when(routeRepository.existsByUser_EmailAndCreatedAtBetween(
+                eq(testEmail),
+                any(),
+                any()
+        )).thenReturn(true);
 
         // Act
         HomeKpisTodayResponseDTO result = homeService.getHomeKpisToday(testEmail);

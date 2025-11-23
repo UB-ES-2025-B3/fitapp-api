@@ -1,4 +1,4 @@
-package com.fitnessapp.fitapp_api.checkpoints;
+package com.fitnessapp.fitapp_api.route;
 
 import com.fitnessapp.fitapp_api.auth.model.UserAuth;
 import com.fitnessapp.fitapp_api.core.exception.RouteNotFoundException;

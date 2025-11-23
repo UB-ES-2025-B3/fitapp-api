@@ -74,13 +74,18 @@ public class HomeServiceImpl implements HomeService {
                 today.atTime(LocalTime.MAX)
         );
 
+        UserProfile profile = userProfileRepository.findByUser_Email(email)
+                .orElseThrow(() -> new UserProfileNotFoundException("User profile not found for email: " + email));
+        int goalKcalDaily = profile.getGoalKcalDaily();
+
         return new HomeKpisTodayResponseDTO(
                 routesCompleted,
                 totalDurationSec,
                 totalDistanceKm,
                 totalCalories,
                 activeStreak,
-                hasCreatedRoutes
+                hasCreatedRoutes,
+                goalKcalDaily
         );
     }
 

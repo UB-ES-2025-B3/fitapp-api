@@ -85,6 +85,15 @@ public record UserProfileRequestDTO(
                 requiredMode = Schema.RequiredMode.REQUIRED
         )
         @NotNull(message = "Time zone is required")
-        ZoneId timeZone
+        ZoneId timeZone,
+
+        @Schema(
+                description = "Objetivo diario de calorías en Kcal",
+                example = "2200",
+                minimum = "0",
+                requiredMode = Schema.RequiredMode.NOT_REQUIRED
+        )
+        @Min(value = 0, message = "Daily kcal goal must be 0 or greater")
+                Integer goalKcalDaily
 ) {
 }

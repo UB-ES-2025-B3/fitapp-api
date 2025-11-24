@@ -1,23 +1,21 @@
-# Nombre del workflow (lo verás en la pestaña "Actions" de GitHub)
-name: Desplegar Backend en Azure App Service
+name: CI/CD Backend - Azure App Service
 
-# Triggers
 on:
-  # 1. Cuando se mergea a 'main'
   push:
     branches:
-      - main
-  # 2. Trigger MANUAL: (Solo aparecerá después del primer merge a 'main')
+      - main      # Despliegue a PROD
+      - preprod   # Despliegue a PREPROD
   workflow_dispatch:
 
 jobs:
   build-and-deploy:
-    # Usamos el sistema operativo estándar para builds
     runs-on: ubuntu-latest
-    environment: prod 
+
+    # Selección automática del entorno
+    environment: ${{ github.ref == 'refs/heads/main' && 'prod' || 'preprod' }}
 
     steps:
-      # 1. Descarga el código del repositorio
+      # 1. Descargar código
       - name: Checkout del repositorio
         uses: actions/checkout@v4
 
@@ -27,30 +25,31 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # 3. Login en el ACR
-      - name: 'Login en Azure Container Registry (ACR)'
+      # 3. Login en ACR
+      - name: 'Login en Azure Container Registry'
         uses: azure/docker-login@v1
         with:
           login-server: ${{ secrets.ACR_LOGIN_SERVER }}
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
-      # 4. Construye y Sube la imagen Docker al ACR
+      # 4. Build & Push
       - name: Construir y subir la imagen Docker
         run: |
           docker build . -t ${{ secrets.ACR_LOGIN_SERVER }}/fitapp-backend:${{ github.sha }}
           docker push ${{ secrets.ACR_LOGIN_SERVER }}/fitapp-backend:${{ github.sha }}
 
-      # 5. Despliega en Azure App Service
+      # 5. Desplegar
+      # VARIABLE 'APP_NAME' para el nombre del recurso al cual desplegamos, según el entorno/rama
       - name: 'Desplegar en Azure App Service'
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'fitapp-backend-api'
+          app-name: ${{ vars.APP_NAME }}
           images: '${{ secrets.ACR_LOGIN_SERVER }}/fitapp-backend:${{ github.sha }}'
 
-      # 6. Logout de Azure por seguridad
+      # 6. Logout
       - name: Logout de Azure
-        if: always() 
+        if: always()
         run: |
           docker logout ${{ secrets.ACR_LOGIN_SERVER }}
           az logout

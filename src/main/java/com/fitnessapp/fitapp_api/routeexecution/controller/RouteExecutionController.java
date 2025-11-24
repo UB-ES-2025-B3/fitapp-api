@@ -25,7 +25,7 @@ public class RouteExecutionController {
     private final RouteExecutionService service;
 
     // ---------------------------------------
-    // POST /api/v1/executions/start/{routeId}
+    // POST /api/v1/executions/me/start/{routeId}
     // ---------------------------------------
     @Operation(
             summary = "Iniciar ejecución de una ruta",
@@ -51,7 +51,7 @@ public class RouteExecutionController {
                     @ApiResponse(responseCode = "401", description = "No autorizado", content = @Content)
             }
     )
-    @PostMapping("/start/{routeId}")
+    @PostMapping("/me/start/{routeId}")
     public ResponseEntity<RouteExecutionResponseDTO> startExecution(
             Principal principal,
             @PathVariable Long routeId,
@@ -62,7 +62,7 @@ public class RouteExecutionController {
     }
 
     // ---------------------------------------
-    // POST /api/v1/executions/pause/{executionId}
+    // POST /api/v1/executions/me/pause/{executionId}
     // ---------------------------------------
     @Operation(
             summary = "Pausar ejecución",
@@ -80,7 +80,7 @@ public class RouteExecutionController {
                     @ApiResponse(responseCode = "401", description = "No autorizado", content = @Content)
             }
     )
-    @PostMapping("/pause/{executionId}")
+    @PostMapping("/me/pause/{executionId}")
     public ResponseEntity<RouteExecutionResponseDTO> pauseExecution(
             Principal principal,
             @PathVariable Long executionId
@@ -89,7 +89,7 @@ public class RouteExecutionController {
     }
 
     // ---------------------------------------
-    // POST /api/v1/executions/resume/{executionId}
+    // POST /api/v1/executions/me/resume/{executionId}
     // ---------------------------------------
     @Operation(
             summary = "Reanudar ejecución",
@@ -107,7 +107,7 @@ public class RouteExecutionController {
                     @ApiResponse(responseCode = "401", description = "No autorizado", content = @Content)
             }
     )
-    @PostMapping("/resume/{executionId}")
+    @PostMapping("/me/resume/{executionId}")
     public ResponseEntity<RouteExecutionResponseDTO> resumeExecution(
             Principal principal,
             @PathVariable Long executionId
@@ -116,7 +116,7 @@ public class RouteExecutionController {
     }
 
     // ---------------------------------------
-    // POST /api/v1/executions/finish/{executionId}
+    // POST /api/v1/executions/me/finish/{executionId}
     // ---------------------------------------
     @Operation(
             summary = "Finalizar ejecución",
@@ -142,7 +142,7 @@ public class RouteExecutionController {
                     @ApiResponse(responseCode = "401", description = "No autorizado", content = @Content)
             }
     )
-    @PostMapping("/finish/{executionId}")
+    @PostMapping("/me/finish/{executionId}")
     public ResponseEntity<RouteExecutionResponseDTO> finishExecution(
             Principal principal,
             @PathVariable Long executionId,
@@ -152,7 +152,7 @@ public class RouteExecutionController {
     }
 
     // ---------------------------------------
-    // GET /api/v1/executions
+    // GET /api/v1/executions/me
     // ---------------------------------------
     @Operation(
             summary = "Obtener mis ejecuciones",
@@ -169,7 +169,7 @@ public class RouteExecutionController {
                     @ApiResponse(responseCode = "401", description = "No autorizado", content = @Content)
             }
     )
-    @GetMapping
+    @GetMapping("me")
     public ResponseEntity<List<RouteExecutionResponseDTO>> getMyExecutions(Principal principal) {
         List<RouteExecutionResponseDTO> executions = service.getMyExecutions(principal.getName());
         return ResponseEntity.ok(executions);

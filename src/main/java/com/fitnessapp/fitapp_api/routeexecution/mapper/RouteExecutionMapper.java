@@ -32,7 +32,8 @@ public interface RouteExecutionMapper {
 
     // --- RESPUESTA ---
     @Mapping(target = "userEmail", source = "user.email")
-    @Mapping(target = "routeId", source = "route.id")
+    @Mapping(target = "routeId", expression = "java(execution.getRoute() != null ? execution.getRoute().getId() : null)")
+    @Mapping(target = "routeName", expression = "java(execution.getRoute() != null ? execution.getRoute().getName() : \"Ruta Eliminada\")")
     RouteExecutionResponseDTO toResponseDto(RouteExecution execution);
 
 }

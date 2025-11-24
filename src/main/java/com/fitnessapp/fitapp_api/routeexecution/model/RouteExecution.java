@@ -5,6 +5,8 @@ import com.fitnessapp.fitapp_api.route.model.Route;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
@@ -28,6 +30,7 @@ public class RouteExecution {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "route_id", nullable = false, foreignKey = @ForeignKey(name = "fk_route_execution_route"))
+    @NotFound(action = NotFoundAction.IGNORE)
     private Route route;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

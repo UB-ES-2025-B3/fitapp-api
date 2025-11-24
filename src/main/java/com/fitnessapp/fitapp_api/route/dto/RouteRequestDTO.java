@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 
 public record RouteRequestDTO(
@@ -44,7 +45,14 @@ public record RouteRequestDTO(
         @NotNull(message = "Distance is required")
         @DecimalMin(value = "0.01", message = "Distance must be greater than 0")
         @Digits(integer = 4, fraction = 2, message = "Distance must be a valid number (max 4 digits and 2 decimals")
-        BigDecimal distanceKm
+        BigDecimal distanceKm,
+
+        @Schema(
+                description = "Lista opcional de checkpoints",
+                example = "[{ \"name\": \"Parada 1\", \"point\": \"41.0,-8.5\" }]",
+                requiredMode = Schema.RequiredMode.NOT_REQUIRED
+        )
+        List<CheckpointRequestDTO> checkpoints
 
 ) {
 }

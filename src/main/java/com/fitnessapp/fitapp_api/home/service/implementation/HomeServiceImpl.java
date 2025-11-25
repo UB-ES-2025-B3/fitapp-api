@@ -15,8 +15,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -36,32 +38,43 @@ public class HomeServiceImpl implements HomeService {
         }
 
         List<RouteExecution> userRoutesExecutions = routeExecutionRepository.findAllByUserEmail(email);
-        return calculateKpisForToday(userRoutesExecutions,email);
+        return calculateKpisForToday(userRoutesExecutions,email, profile);
     }
 
-    private HomeKpisTodayResponseDTO calculateKpisForToday(List<RouteExecution> routesExecutions,String email) {
+    private HomeKpisTodayResponseDTO calculateKpisForToday(List<RouteExecution> routesExecutions,String email,UserProfile profile) {
         LocalDate today = LocalDate.now();
 
         List<RouteExecution> todaysCompletedRoutes = routesExecutions.stream()
-                .filter(routeExecution -> routeExecution.getEndTime().toLocalDate().equals(today))
+                // 1. Filtrar por estado FINALIZADO primero
                 .filter(routeExecution -> routeExecution.getStatus() == RouteExecution.RouteExecutionStatus.FINISHED)
+                .filter(routeExecution -> routeExecution.getEndTime() != null)
+                // 2. Ahora es seguro llamar a getEndTime(), porque las rutas finalizadas lo tienen
+                .filter(routeExecution -> routeExecution.getEndTime().toLocalDate().equals(today))
                 .toList();
         int routesCompleted = todaysCompletedRoutes.size();
         long totalDurationSec = todaysCompletedRoutes.stream()
-                .mapToLong(RouteExecution::getDurationSec)
+                .mapToLong(routeExecution -> routeExecution.getDurationSec() != null ? routeExecution.getDurationSec() : 0L)
                 .sum();
         double totalDistanceKm = todaysCompletedRoutes.stream()
+                .filter(routeExecution -> routeExecution.getRoute() != null) // <--- Proteger contra rutas borradas
                 .mapToDouble(routeExecution -> routeExecution.getRoute().getDistanceKm().doubleValue())
                 .sum();
+
         double totalCalories = todaysCompletedRoutes.stream()
+                .filter(routeExecution -> routeExecution.getCalories() != null)
                 .mapToDouble(routeExecution -> routeExecution.getCalories().doubleValue())
                 .sum();
 
         int activeStreak = calculateActiveStreak(routesExecutions);
 
-        List<Route> routes = routeRepository.findAllByUserEmail(email).stream()
-                .filter(route -> route.getCreatedAt().toLocalDate().equals(today))
-                .toList();
+        // Consultamos a la BD directamente en lugar de traer toda la lista
+        boolean hasCreatedRoutes = routeRepository.existsByUser_EmailAndCreatedAtBetween(
+                email,
+                today.atStartOfDay(),
+                today.atTime(LocalTime.MAX)
+        );
+
+        int goalKcalDaily = profile.getGoalKcalDaily();
 
         return new HomeKpisTodayResponseDTO(
                 routesCompleted,
@@ -69,14 +82,17 @@ public class HomeServiceImpl implements HomeService {
                 totalDistanceKm,
                 totalCalories,
                 activeStreak,
-                !routes.isEmpty()
+                hasCreatedRoutes,
+                goalKcalDaily
         );
     }
 
     private int calculateActiveStreak(List<RouteExecution> completedRoutes) {
         List<LocalDate> completionDates = completedRoutes.stream()
                 .filter(routeExecution -> routeExecution.getStatus() == RouteExecution.RouteExecutionStatus.FINISHED)
-                .map(routeExecution -> routeExecution.getEndTime().toLocalDate())
+                .map(RouteExecution::getEndTime)
+                .filter(Objects::nonNull)
+                .map(java.time.LocalDateTime::toLocalDate)
                 .distinct()
                 .sorted(Comparator.reverseOrder())
                 .toList();

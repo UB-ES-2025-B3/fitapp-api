@@ -1,9 +1,6 @@
 package com.fitnessapp.fitapp_api.auth.service.implementation;
 
-import com.fitnessapp.fitapp_api.auth.dto.LoginUserRequestDTO;
-import com.fitnessapp.fitapp_api.auth.dto.LoginUserResponseDTO;
-import com.fitnessapp.fitapp_api.auth.dto.RegisterUserRequestDTO;
-import com.fitnessapp.fitapp_api.auth.dto.UserAuthResponseDTO;
+import com.fitnessapp.fitapp_api.auth.dto.*;
 import com.fitnessapp.fitapp_api.auth.mapper.UserAuthMapper;
 import com.fitnessapp.fitapp_api.auth.model.UserAuth;
 import com.fitnessapp.fitapp_api.auth.repository.UserAuthRepository;
@@ -85,5 +82,37 @@ public class UserAuthServiceImpl implements UserAuthService {
                 token,
                 profileExists
         );
+    }
+
+    @Override
+    public UserAuthResponseDTO changePassword(String email, ChangePasswordRequestDTO dto) {
+        // Recuperar el usuario por email
+        UserAuth user = userAuthRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // Verificar que la contraseña actual coincida
+        if (!passwordEncoder.matches(dto.currentPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Current password is incorrect");
+        }
+
+        // Verificar que la nueva contraseña coincida con la confirmación
+        if (!dto.newPassword().equals(dto.confirmPassword())) {
+            throw new IllegalArgumentException("New password and confirmation do not match");
+        }
+
+        // Codificar y guardar la nueva contraseña
+        user.setPassword(passwordEncoder.encode(dto.newPassword()));
+        userAuthRepository.save(user);
+
+        // Opcional: generar un nuevo token para mantener sesión activa
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(email, dto.newPassword())
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String token = jwtUtils.createToken(authentication);
+
+        // Retornar DTO con token actualizado y mensaje de éxito
+        return new UserAuthResponseDTO(user.getId(), token,
+                userProfileRepository.existsByUser_Email(email));
     }
 }

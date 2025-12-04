@@ -1,5 +1,6 @@
 package com.fitnessapp.fitapp_api.routeexecution.service;
 
+import com.fitnessapp.fitapp_api.routeexecution.dto.RouteExecutionHistoryResponseDTO;
 import com.fitnessapp.fitapp_api.routeexecution.dto.RouteExecutionRequestDTO;
 import com.fitnessapp.fitapp_api.routeexecution.dto.RouteExecutionResponseDTO;
 
@@ -12,5 +13,5 @@ public interface RouteExecutionService {
     RouteExecutionResponseDTO pauseExecution(String email, Long executionId);
     RouteExecutionResponseDTO resumeExecution(String email, Long executionId);
     RouteExecutionResponseDTO finishExecution(String email, Long executionId, RouteExecutionRequestDTO request);
-
+    List<RouteExecutionHistoryResponseDTO> getMyCompletedExecutionsHistory(String email);
 }

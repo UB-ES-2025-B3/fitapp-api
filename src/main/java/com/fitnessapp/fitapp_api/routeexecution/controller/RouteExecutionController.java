@@ -1,5 +1,6 @@
 package com.fitnessapp.fitapp_api.routeexecution.controller;
 
+import com.fitnessapp.fitapp_api.routeexecution.dto.RouteExecutionHistoryResponseDTO;
 import com.fitnessapp.fitapp_api.routeexecution.dto.RouteExecutionRequestDTO;
 import com.fitnessapp.fitapp_api.routeexecution.dto.RouteExecutionResponseDTO;
 import com.fitnessapp.fitapp_api.routeexecution.service.RouteExecutionService;
@@ -173,5 +174,29 @@ public class RouteExecutionController {
     public ResponseEntity<List<RouteExecutionResponseDTO>> getMyExecutions(Principal principal) {
         List<RouteExecutionResponseDTO> executions = service.getMyExecutions(principal.getName());
         return ResponseEntity.ok(executions);
+    }
+
+    // ---------------------------------------
+    // GET /api/v1/executions/me/history
+    // ---------------------------------------
+    @Operation(
+            summary = "Obtener historial de ejecuciones finalizadas",
+            description = "Devuelve el historial de ejecuciones finalizadas por el usuario autenticado.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Historial de ejecuciones obtenido correctamente",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = RouteExecutionResponseDTO.class)
+                            )
+                    ),
+                    @ApiResponse(responseCode = "401", description = "No autorizado", content = @Content)
+            }
+    )
+    @GetMapping("me/history")
+    public ResponseEntity<List<RouteExecutionHistoryResponseDTO>> getMyCompletedExecutionsHistory(Principal principal) {
+        List<RouteExecutionHistoryResponseDTO> history = service.getMyCompletedExecutionsHistory(principal.getName());
+        return ResponseEntity.ok(history);
     }
 }

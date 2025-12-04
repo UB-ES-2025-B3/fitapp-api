@@ -6,6 +6,7 @@ import com.fitnessapp.fitapp_api.core.exception.RouteExecutionNotFoundException;
 import com.fitnessapp.fitapp_api.core.exception.RouteNotFoundException;
 import com.fitnessapp.fitapp_api.core.exception.UserAuthNotFoundException;
 import com.fitnessapp.fitapp_api.core.exception.UserProfileNotCompletedException;
+import com.fitnessapp.fitapp_api.routeexecution.dto.RouteExecutionHistoryResponseDTO;
 import com.fitnessapp.fitapp_api.routeexecution.dto.RouteExecutionRequestDTO;
 import com.fitnessapp.fitapp_api.routeexecution.dto.RouteExecutionResponseDTO;
 import com.fitnessapp.fitapp_api.routeexecution.mapper.RouteExecutionMapper;
@@ -206,13 +207,24 @@ public class RouteExecutionServiceImpl implements RouteExecutionService {
     }
 
     /**
-     * Listar ejecuciones del usuario
+     * Listar ejecuciones totales del usuario
      */
     @Transactional(readOnly = true)
     public List<RouteExecutionResponseDTO> getMyExecutions(String email) {
         return executionRepository.findAllByUserEmail(email)
                 .stream()
                 .map(mapper::toResponseDto)
+                .toList();
+    }
+
+    /**
+     * Listar ejecuciones completadas del usuario
+     */
+    @Transactional(readOnly = true)
+    public List<RouteExecutionHistoryResponseDTO> getMyCompletedExecutionsHistory(String email) {
+        return executionRepository.findAllByUserEmailAndStatusOrderByEndTimeDesc(email, RouteExecutionStatus.FINISHED)
+                .stream()
+                .map(mapper::toHistoryResponseDto)
                 .toList();
     }
 

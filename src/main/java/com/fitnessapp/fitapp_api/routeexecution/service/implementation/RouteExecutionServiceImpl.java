@@ -188,7 +188,6 @@ public class RouteExecutionServiceImpl implements RouteExecutionService {
                 String activityStr = exec.getActivityType() != null ? exec.getActivityType().toString() : "WALKING_MODERATE";
 
                 CCActivityRequest ccRequest = new CCActivityRequest(activityStr, exec.getDurationSec());
-
                 double calories = calorieCalculationService.calculateCalories(profile, ccRequest);
                 exec.setCalories(BigDecimal.valueOf(calories));
             } else {

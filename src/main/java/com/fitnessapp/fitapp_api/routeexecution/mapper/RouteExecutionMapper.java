@@ -39,7 +39,7 @@ public interface RouteExecutionMapper {
 
     // --- HISTORIAL ---
     @Mapping(target = "routeName", expression = "java(execution.getRoute() != null ? execution.getRoute().getName() : \"Ruta Eliminada\")")
-    @Mapping(target = "distanceKm", source = "java(execution.getRoute() != null ? execution.getRoute().getDistanceKm()")
+    @Mapping(target = "distanceKm", expression = "java(execution.getRoute() != null ? execution.getRoute().getDistanceKm() : null)")
     RouteExecutionHistoryResponseDTO toHistoryResponseDto(RouteExecution execution);
 
 }

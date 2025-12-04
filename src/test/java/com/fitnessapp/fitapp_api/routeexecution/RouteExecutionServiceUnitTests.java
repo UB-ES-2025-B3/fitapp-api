@@ -10,6 +10,7 @@ import com.fitnessapp.fitapp_api.profile.model.UserProfile;
 import com.fitnessapp.fitapp_api.profile.repository.UserProfileRepository;
 import com.fitnessapp.fitapp_api.route.model.Route;
 import com.fitnessapp.fitapp_api.route.repository.RouteRepository;
+import com.fitnessapp.fitapp_api.routeexecution.dto.RouteExecutionHistoryResponseDTO;
 import com.fitnessapp.fitapp_api.routeexecution.dto.RouteExecutionRequestDTO;
 import com.fitnessapp.fitapp_api.routeexecution.dto.RouteExecutionResponseDTO;
 import com.fitnessapp.fitapp_api.routeexecution.mapper.RouteExecutionMapper;
@@ -29,7 +30,6 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -269,5 +269,42 @@ class RouteExecutionServiceUnitTests {
 
         assertEquals(2, result.size());
         verify(executionRepository).findAllByUserEmail(user.getEmail());
+    }
+
+    // ============================================
+    // getMyCompletedExecutionsHistory
+    // ============================================
+    // TODO: Aca se necesita un test de integracion para verificar que solo se retornan las ejecuciones FINISHED
+    @Test
+    @DisplayName("getMyCompletedExecutionsHistory — devuelve historial ordenado y mapeado")
+    void getMyCompletedExecutionsHistory_ShouldReturnHistory() {
+        LocalDateTime now = LocalDateTime.now();
+        RouteExecution older = createExecution(600L, RouteExecutionStatus.FINISHED, now.minusHours(2), null, 0L, 3600L);
+        older.setEndTime(now.minusHours(2));
+        RouteExecution recent = createExecution(601L, RouteExecutionStatus.FINISHED, now.minusMinutes(30), null, 0L, 1800L);
+        recent.setEndTime(now.minusMinutes(30));
+
+        when(executionRepository.findAllByUserEmailAndStatusOrderByEndTimeDesc(
+                user.getEmail(), RouteExecutionStatus.FINISHED))
+                .thenReturn(List.of(recent, older));
+
+        List<RouteExecutionHistoryResponseDTO> history = service.getMyCompletedExecutionsHistory(user.getEmail());
+
+        assertEquals(2, history.size());
+        assertEquals(recent.getRoute().getName(), history.get(0).routeName());
+        assertEquals(older.getDurationSec(), history.get(1).durationSec());
+        verify(executionRepository).findAllByUserEmailAndStatusOrderByEndTimeDesc(user.getEmail(), RouteExecutionStatus.FINISHED);
+    }
+
+    @Test
+    @DisplayName("getMyCompletedExecutionsHistory — retorna lista vacía cuando no hay ejecuciones")
+    void getMyCompletedExecutionsHistory_ShouldReturnEmptyList() {
+        when(executionRepository.findAllByUserEmailAndStatusOrderByEndTimeDesc(user.getEmail(), RouteExecutionStatus.FINISHED))
+                .thenReturn(List.of());
+
+        List<RouteExecutionHistoryResponseDTO> history = service.getMyCompletedExecutionsHistory(user.getEmail());
+
+        assertTrue(history.isEmpty());
+        verify(executionRepository).findAllByUserEmailAndStatusOrderByEndTimeDesc(user.getEmail(), RouteExecutionStatus.FINISHED);
     }
 }

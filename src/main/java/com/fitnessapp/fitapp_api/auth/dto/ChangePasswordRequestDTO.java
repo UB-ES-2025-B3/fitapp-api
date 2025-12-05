@@ -26,7 +26,7 @@ public record ChangePasswordRequestDTO(
         @Size(min = 8, message = "New password must be at least 8 characters long")
         @Pattern(
                 regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[^A-Za-z\\d]).+$",
-                message = "La contraseña debe tener al menos una letra, un número y un símbolo"
+                message = "Password must contain at least one letter, one number, and one symbol"
         )
         String newPassword,
 

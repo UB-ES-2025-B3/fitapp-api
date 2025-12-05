@@ -1,7 +1,7 @@
 package com.fitnessapp.fitapp_api.calories.service.implementation;
 
 import com.fitnessapp.fitapp_api.calories.service.CalorieCalculationService;
-import com.fitnessapp.fitapp_api.calories.service.dto.CCActivityRequest;
+import com.fitnessapp.fitapp_api.calories.dto.CCActivityRequest;
 import com.fitnessapp.fitapp_api.core.exception.UserProfileNotCompletedException;
 import com.fitnessapp.fitapp_api.profile.model.UserProfile;
 import com.fitnessapp.fitapp_api.profile.service.UserProfileService;

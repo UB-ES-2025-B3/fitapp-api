@@ -1,11 +1,13 @@
 package com.fitnessapp.fitapp_api.routeexecution.service.implementation;
 
 import com.fitnessapp.fitapp_api.calories.service.CalorieCalculationService;
-import com.fitnessapp.fitapp_api.calories.service.dto.CCActivityRequest;
+import com.fitnessapp.fitapp_api.calories.dto.CCActivityRequest;
 import com.fitnessapp.fitapp_api.core.exception.RouteExecutionNotFoundException;
 import com.fitnessapp.fitapp_api.core.exception.RouteNotFoundException;
 import com.fitnessapp.fitapp_api.core.exception.UserAuthNotFoundException;
 import com.fitnessapp.fitapp_api.core.exception.UserProfileNotCompletedException;
+import com.fitnessapp.fitapp_api.gamification.dto.PCActivityRequestDTO;
+import com.fitnessapp.fitapp_api.gamification.service.PointsCalculationService;
 import com.fitnessapp.fitapp_api.routeexecution.dto.RouteExecutionRequestDTO;
 import com.fitnessapp.fitapp_api.routeexecution.dto.RouteExecutionResponseDTO;
 import com.fitnessapp.fitapp_api.routeexecution.mapper.RouteExecutionMapper;
@@ -41,6 +43,7 @@ public class RouteExecutionServiceImpl implements RouteExecutionService {
     private final UserProfileRepository userProfileRepository;
     private final RouteExecutionMapper mapper;
     private final CalorieCalculationService calorieCalculationService;
+    private final PointsCalculationService pointsCalculationService;
 
     /**
      * Inicia una ejecución: crea entidad con status IN_PROGRESS y startTime = now.
@@ -202,6 +205,34 @@ public class RouteExecutionServiceImpl implements RouteExecutionService {
             // Atrapamos cualquier otro error inesperado
             log.error("Unexpected error calculating calories for execution {}", exec.getId(), e);
             exec.setCalories(BigDecimal.ZERO);
+        }
+    }
+
+    /**
+     * Nuevo método helper para blindar el cálculo de puntos
+     */
+    private void calculateAndSetPointsSafe(RouteExecution exec) {
+        if (exec.getDurationSec() == null || exec.getDurationSec() <= 0) {
+            exec.setPoints(0L);
+            return;
+        }
+        try {
+            UserProfile profile = userProfileRepository.findByUser_Email(
+                    exec.getUser().getEmail()).orElse(null);
+
+            if (profile != null) {
+                PCActivityRequestDTO pcActivityRequestDTO = new PCActivityRequestDTO(
+                        exec.getRoute().getDistanceKm().doubleValue(),
+                        exec.getDurationSec(),
+                        exec.getActivityType().toString(),
+                        profile.
+                );
+            }
+            long points = pointsCalculationService.calculatePoints(exec);
+            exec.setPoints(points);
+        } catch (Exception e) {
+            log.error("Unexpected error calculating points for execution {}", exec.getId(), e);
+            exec.setPoints(0L);
         }
     }
 

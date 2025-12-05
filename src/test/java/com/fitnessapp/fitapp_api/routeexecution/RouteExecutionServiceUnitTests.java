@@ -2,7 +2,7 @@ package com.fitnessapp.fitapp_api.routeexecution;
 
 import com.fitnessapp.fitapp_api.auth.model.UserAuth;
 import com.fitnessapp.fitapp_api.calories.service.CalorieCalculationService;
-import com.fitnessapp.fitapp_api.calories.service.dto.CCActivityRequest;
+import com.fitnessapp.fitapp_api.calories.dto.CCActivityRequest;
 import com.fitnessapp.fitapp_api.core.exception.RouteNotFoundException;
 import com.fitnessapp.fitapp_api.core.exception.RouteExecutionNotFoundException;
 import com.fitnessapp.fitapp_api.core.exception.UserAuthNotFoundException;
@@ -29,7 +29,6 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;

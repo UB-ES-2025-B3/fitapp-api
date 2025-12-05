@@ -102,7 +102,7 @@ public class UserAuthServiceImpl implements UserAuthService {
         }
 
         // Verificar que la nueva contraseña cumple los requisitos mínimos
-        if (!dto.newPassword().matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d).{8,}$")) {
+        if (!dto.newPassword().matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[^A-Za-z\\d]).{8,}$")) {
             throw new IllegalArgumentException("New password does not meet requirements");
         }
 

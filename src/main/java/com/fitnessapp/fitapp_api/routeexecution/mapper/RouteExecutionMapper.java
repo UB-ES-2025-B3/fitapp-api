@@ -24,6 +24,7 @@ public interface RouteExecutionMapper {
     @Mapping(target = "totalPausedTimeSec", ignore = true)
     @Mapping(target = "durationSec", ignore = true)
     @Mapping(target = "calories", ignore = true)
+    @Mapping(target = "points" , ignore = true)
     RouteExecution toEntity(RouteExecutionRequestDTO dto, UserAuth userAuth);
 
     // --- ACTUALIZAR ---

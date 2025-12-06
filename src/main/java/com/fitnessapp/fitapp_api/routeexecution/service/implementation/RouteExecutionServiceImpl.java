@@ -169,6 +169,9 @@ public class RouteExecutionServiceImpl implements RouteExecutionService {
         // Método seguro para calcular calorías sin romper la transacción
         calculateAndSetCaloriesSafe(email, exec);
 
+        // Método seguro para calcular puntos sin romper la transacción
+        calculateAndSetPointsSafe(exec);
+
         RouteExecution saved = executionRepository.save(exec);
         return mapper.toResponseDto(saved);
     }
@@ -221,15 +224,28 @@ public class RouteExecutionServiceImpl implements RouteExecutionService {
                     exec.getUser().getEmail()).orElse(null);
 
             if (profile != null) {
-                PCActivityRequestDTO pcActivityRequestDTO = new PCActivityRequestDTO(
+                if (exec.getActivityType() == null) {
+                    throw new IllegalArgumentException("Activity type is required for points calculation");
+                }
+                PCActivityRequestDTO pcRequest = new PCActivityRequestDTO(
                         exec.getRoute().getDistanceKm().doubleValue(),
                         exec.getDurationSec(),
                         exec.getActivityType().toString(),
-                        profile.
+                        calorieCalculationService.hasReachedDailyGoal(profile)
                 );
+                long points = pointsCalculationService.calculatePoints(pcRequest);
+                exec.setPoints(points);
+
+                long currentPoints = profile.getPoints() != null ? profile.getPoints() : 0L;
+                profile.setPoints(currentPoints + points);
+                userProfileRepository.save(profile);
+            } else {
+                log.warn("No points calculation: User profile not found for email {}", exec.getUser().getEmail());
+                exec.setPoints(0L);
             }
-            long points = pointsCalculationService.calculatePoints(exec);
-            exec.setPoints(points);
+        } catch (IllegalArgumentException e) {
+            log.warn("Cannot calculate points for execution {}: {}", exec.getId(), e.getMessage());
+            exec.setPoints(0L);
         } catch (Exception e) {
             log.error("Unexpected error calculating points for execution {}", exec.getId(), e);
             exec.setPoints(0L);

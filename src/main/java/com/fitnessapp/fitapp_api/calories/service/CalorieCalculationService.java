@@ -6,4 +6,5 @@ import com.fitnessapp.fitapp_api.profile.model.UserProfile;
 
 public interface CalorieCalculationService {
     double calculateCalories(UserProfile profile, CCActivityRequest activity);
+    boolean hasReachedDailyGoal(UserProfile profile);
 }

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class PointsCalculationServiceImpl implements PointsCalculationService {
     @Override
-    public double calculatePoints(PCActivityRequestDTO pcActivityRequestDTO) {
+    public long calculatePoints(PCActivityRequestDTO pcActivityRequestDTO) {
         if (pcActivityRequestDTO.durationSec() < PointsConfig.MIN_DURATION_MINUTES.getValue()) {
             return 0;
         }
@@ -28,7 +28,7 @@ public class PointsCalculationServiceImpl implements PointsCalculationService {
             totalPoints += PointsConfig.DAILY_GOAL_BONUS.getValue();
         }
 
-        return Math.min(totalPoints, PointsConfig.MAX_PER_DAY.getValue());
+        return (long) Math.min(totalPoints, PointsConfig.MAX_PER_DAY.getValue());
     }
 
     private boolean isPlausiblePace(double distanceKm, double durationMinutes, String activityType) {

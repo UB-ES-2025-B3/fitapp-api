@@ -4,5 +4,5 @@ import com.fitnessapp.fitapp_api.gamification.dto.PCActivityRequestDTO;
 import com.fitnessapp.fitapp_api.routeexecution.model.RouteExecution;
 
 public interface PointsCalculationService {
-    double calculatePoints(PCActivityRequestDTO pcActivityRequestDTO);
+    long calculatePoints(PCActivityRequestDTO pcActivityRequestDTO);
 }

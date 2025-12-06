@@ -1,4 +1,4 @@
-package com.fitnessapp.fitapp_api.calories.service.dto;
+package com.fitnessapp.fitapp_api.calories.dto;
 
 public record CCActivityRequest(
     String activityType,

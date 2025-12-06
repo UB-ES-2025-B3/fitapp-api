@@ -81,6 +81,12 @@ public record RouteExecutionResponseDTO(
         Double calories,
 
         @Schema(
+                description = "Puntos obtenidos por la ejecución",
+                example = "150"
+        )
+        Long points,
+
+        @Schema(
                 description = "Notas opcionales del usuario",
                 example = "Ruta dura con viento"
         )

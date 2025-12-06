@@ -27,7 +27,7 @@ public enum PointsConfig {
     DAILY_GOAL_BONUS(50),
     MAX_PER_SESSION(300),
     MAX_PER_DAY(800),
-    MIN_DURATION_MINUTES(5),
+    MIN_DURATION_MINUTES(1),
     MAX_SESSIONS_PER_DAY(10);
 
     private final int value;

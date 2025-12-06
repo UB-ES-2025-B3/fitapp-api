@@ -128,7 +128,7 @@ class CalorieCalculationServiceUnitTest {
                 eq(profile.getUser().getEmail()),
                 any(LocalDateTime.class),
                 any(LocalDateTime.class),
-                eq(RouteExecution.RouteExecutionStatus.FINISHED.toString())
+                eq(RouteExecution.RouteExecutionStatus.FINISHED)
         )).thenReturn(List.of(todayExec, previousExec));
 
         assertTrue(service.hasReachedDailyGoal(profile));
@@ -152,7 +152,7 @@ class CalorieCalculationServiceUnitTest {
                 eq(profile.getUser().getEmail()),
                 any(LocalDateTime.class),
                 any(LocalDateTime.class),
-                eq(RouteExecution.RouteExecutionStatus.FINISHED.toString())
+                eq(RouteExecution.RouteExecutionStatus.FINISHED)
         )).thenReturn(List.of(validExec, nextDayExec));
 
         assertFalse(service.hasReachedDailyGoal(profile));

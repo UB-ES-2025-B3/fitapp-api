@@ -42,6 +42,12 @@ public record RouteExecutionHistoryResponseDTO(
                 description = "Calorías estimadas consumidas durante la ejecución.",
                 example = "350.50"
         )
-        BigDecimal calories
+        BigDecimal calories,
+
+        @Schema(
+                description = "Puntos obtenidos por la ejecución.",
+                example = "150"
+        )
+        long points
 ) {
 }

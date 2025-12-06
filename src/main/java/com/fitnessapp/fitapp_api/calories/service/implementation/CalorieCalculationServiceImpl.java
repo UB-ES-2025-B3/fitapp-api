@@ -7,7 +7,6 @@ import com.fitnessapp.fitapp_api.profile.model.UserProfile;
 import com.fitnessapp.fitapp_api.profile.service.UserProfileService;
 import com.fitnessapp.fitapp_api.routeexecution.model.RouteExecution;
 import com.fitnessapp.fitapp_api.routeexecution.repository.RouteExecutionRepository;
-import com.fitnessapp.fitapp_api.routeexecution.service.RouteExecutionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -405,4 +405,34 @@ class RouteExecutionServiceUnitTests {
         assertTrue(captor.getValue().dailyGoalCompleted());
         verify(userProfileRepository).save(profile);
     }
+
+    @Test
+    @DisplayName("finishExecution — perfil sin goal diario cumplido no marca el flag ni aplica bonus")
+    void finishExecution_DailyGoalNotCompleted_ShouldSendFalseFlag() {
+        LocalDateTime start = LocalDateTime.now().minusMinutes(30);
+        RouteExecution exec = createExecution(721L, RouteExecutionStatus.IN_PROGRESS, start, null, 0L, null);
+        exec.setActivityType(RouteExecution.ActivityType.CYCLING_MODERATE);
+
+        UserProfile profile = new UserProfile();
+        profile.setUser(user);
+        profile.setPoints(50L);
+
+        when(executionRepository.findByIdAndUserEmail(721L, user.getEmail())).thenReturn(Optional.of(exec));
+        when(userProfileRepository.findByUser_Email(user.getEmail())).thenReturn(Optional.of(profile));
+        when(calorieCalculationService.calculateCalories(any(UserProfile.class), any(CCActivityRequest.class))).thenReturn(140.0);
+        when(calorieCalculationService.hasReachedDailyGoal(profile)).thenReturn(false);
+        when(pointsCalculationService.calculatePoints(any())).thenReturn(25L);
+        when(executionRepository.save(any(RouteExecution.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        var dto = service.finishExecution(user.getEmail(), 721L,
+                new RouteExecutionRequestDTO(RouteExecution.ActivityType.CYCLING_MODERATE, "sin bonus"));
+
+        ArgumentCaptor<PCActivityRequestDTO> captor = ArgumentCaptor.forClass(PCActivityRequestDTO.class);
+        verify(pointsCalculationService).calculatePoints(captor.capture());
+
+        assertEquals(25L, dto.points());
+        assertEquals(75L, profile.getPoints());
+        assertFalse(captor.getValue().dailyGoalCompleted());
+        verify(userProfileRepository).save(profile);
+    }
 }

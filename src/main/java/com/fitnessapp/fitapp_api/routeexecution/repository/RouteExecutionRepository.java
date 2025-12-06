@@ -15,6 +15,6 @@ public interface RouteExecutionRepository extends JpaRepository<RouteExecution, 
 
     boolean existsByRouteId(Long routeId);
 
-    List<RouteExecution> findAllByUserEmailAndEndTimeBetweenAndStatus(String email, LocalDateTime startTime, LocalDateTime endTime, String finished);
+    List<RouteExecution> findAllByUserEmailAndEndTimeBetweenAndStatus(String email, LocalDateTime startTime, LocalDateTime endTime, String status);
 
 }

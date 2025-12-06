@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 public class PointsCalculationServiceImpl implements PointsCalculationService {
     @Override
     public long calculatePoints(PCActivityRequestDTO pcActivityRequestDTO) {
-        if (pcActivityRequestDTO.durationSec() < PointsConfig.MIN_DURATION_MINUTES.getValue()) {
+        if (pcActivityRequestDTO.durationSec() < PointsConfig.MIN_DURATION_MINUTES.getValue() * 60) {
             return 0;
         }
 

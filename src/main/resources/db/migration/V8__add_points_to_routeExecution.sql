@@ -1,0 +1,1 @@
+ALTER TABLE route_executions ADD COLUMN points BIGINT NOT NULL DEFAULT 0;

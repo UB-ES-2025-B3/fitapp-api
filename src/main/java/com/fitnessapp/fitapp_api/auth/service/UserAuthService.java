@@ -1,9 +1,6 @@
 package com.fitnessapp.fitapp_api.auth.service;
 
-import com.fitnessapp.fitapp_api.auth.dto.LoginUserRequestDTO;
-import com.fitnessapp.fitapp_api.auth.dto.LoginUserResponseDTO;
-import com.fitnessapp.fitapp_api.auth.dto.RegisterUserRequestDTO;
-import com.fitnessapp.fitapp_api.auth.dto.UserAuthResponseDTO;
+import com.fitnessapp.fitapp_api.auth.dto.*;
 
 public interface UserAuthService {
     // Metodo para registrar un nuevo usuario
@@ -11,4 +8,8 @@ public interface UserAuthService {
 
     // Metodo para loguear un usuario
     LoginUserResponseDTO login(LoginUserRequestDTO loginUserRequestDTO);
+
+    // Metodo para cambiar contraseña
+    UserAuthResponseDTO changePassword(String email, ChangePasswordRequestDTO dto);
+
 }

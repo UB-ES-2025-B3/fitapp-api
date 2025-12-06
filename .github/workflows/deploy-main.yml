@@ -60,9 +60,17 @@ jobs:
       # Aquí Docker volverá a compilar usando el Dockerfile (Multistage build)
       # Esto garantiza que despliega en un entorno limpio e idéntico al de producción.
       - name: Construir y subir la imagen Docker
+        # Construimos la imagen y le asignamos DOS tags
+        # 1. El específico (SHA) para el despliegue seguro.
+        # 2. El genérico (latest) para que el Front la encuentre.
+        # Y subimos ambas etiquetas al registro
         run: |
-          docker build . -t ${{ secrets.ACR_LOGIN_SERVER }}/fitapp-backend:${{ github.sha }}
+          docker build . \
+          -t ${{ secrets.ACR_LOGIN_SERVER }}/fitapp-backend:${{ github.sha }} \
+          -t ${{ secrets.ACR_LOGIN_SERVER }}/fitapp-backend:latest
+          
           docker push ${{ secrets.ACR_LOGIN_SERVER }}/fitapp-backend:${{ github.sha }}
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/fitapp-backend:latest
 
       - name: 'Desplegar en Azure App Service'
         uses: azure/webapps-deploy@v3

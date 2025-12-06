@@ -57,7 +57,7 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
-      # Aquí Docker volverá a compilar usando el Dockerfile (Multistage build)
+      # Aquí Docker volverá a compilar usando el Dockerfile
       # Esto garantiza que despliega en un entorno limpio e idéntico al de producción.
       - name: Construir y subir la imagen Docker
         # Construimos la imagen y le asignamos DOS tags

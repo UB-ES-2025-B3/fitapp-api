@@ -236,8 +236,9 @@ public class RouteExecutionServiceImpl implements RouteExecutionService {
                 long points = pointsCalculationService.calculatePoints(pcRequest);
                 exec.setPoints(points);
 
-                // Atomically increment points to avoid race condition
-                userProfileRepository.incrementPointsById(profile.getId(), points);
+                long currentPoints = profile.getPoints() != null ? profile.getPoints() : 0L;
+                profile.setPoints(currentPoints + points);
+                userProfileRepository.save(profile);
             } else {
                 log.warn("No points calculation: User profile not found for email {}", exec.getUser().getEmail());
                 exec.setPoints(0L);

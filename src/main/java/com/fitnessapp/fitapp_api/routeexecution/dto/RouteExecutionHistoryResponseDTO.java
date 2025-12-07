@@ -48,6 +48,6 @@ public record RouteExecutionHistoryResponseDTO(
                 description = "Puntos obtenidos por la ejecución.",
                 example = "150"
         )
-        long points
+        Long points
 ) {
 }

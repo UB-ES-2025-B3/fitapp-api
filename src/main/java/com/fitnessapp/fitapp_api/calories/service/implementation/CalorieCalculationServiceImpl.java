@@ -100,7 +100,7 @@ public class CalorieCalculationServiceImpl implements CalorieCalculationService 
                 profile.getUser().getEmail(),
                 systemStart.toLocalDateTime(),
                 systemEnd.toLocalDateTime(),
-                RouteExecution.RouteExecutionStatus.FINISHED.toString()
+                RouteExecution.RouteExecutionStatus.FINISHED
         );
 
         return userRoutesExecutions.stream()

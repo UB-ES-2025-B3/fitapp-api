@@ -267,6 +267,7 @@ public class RouteExecutionServiceImpl implements RouteExecutionService {
     /**
      * Obtener historial de ejecuciones completadas del usuario
      */
+    @Override
     @Transactional(readOnly = true)
     public List<RouteExecutionHistoryResponseDTO> getMyCompletedExecutionsHistory(String email) {
         return executionRepository.findAllByUserEmailAndStatusOrderByEndTimeDesc(email, RouteExecutionStatus.FINISHED)

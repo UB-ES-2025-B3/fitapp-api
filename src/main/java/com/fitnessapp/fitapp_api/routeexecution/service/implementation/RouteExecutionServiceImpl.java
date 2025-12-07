@@ -1,25 +1,26 @@
 package com.fitnessapp.fitapp_api.routeexecution.service.implementation;
 
-import com.fitnessapp.fitapp_api.calories.service.CalorieCalculationService;
+import com.fitnessapp.fitapp_api.auth.model.UserAuth;
+import com.fitnessapp.fitapp_api.auth.repository.UserAuthRepository;
 import com.fitnessapp.fitapp_api.calories.dto.CCActivityRequest;
+import com.fitnessapp.fitapp_api.calories.service.CalorieCalculationService;
 import com.fitnessapp.fitapp_api.core.exception.RouteExecutionNotFoundException;
 import com.fitnessapp.fitapp_api.core.exception.RouteNotFoundException;
 import com.fitnessapp.fitapp_api.core.exception.UserAuthNotFoundException;
 import com.fitnessapp.fitapp_api.core.exception.UserProfileNotCompletedException;
 import com.fitnessapp.fitapp_api.gamification.dto.PCActivityRequestDTO;
 import com.fitnessapp.fitapp_api.gamification.service.PointsCalculationService;
+import com.fitnessapp.fitapp_api.profile.model.UserProfile;
+import com.fitnessapp.fitapp_api.profile.repository.UserProfileRepository;
+import com.fitnessapp.fitapp_api.route.model.Route;
+import com.fitnessapp.fitapp_api.route.repository.RouteRepository;
+import com.fitnessapp.fitapp_api.routeexecution.dto.RouteExecutionHistoryResponseDTO;
 import com.fitnessapp.fitapp_api.routeexecution.dto.RouteExecutionRequestDTO;
 import com.fitnessapp.fitapp_api.routeexecution.dto.RouteExecutionResponseDTO;
 import com.fitnessapp.fitapp_api.routeexecution.mapper.RouteExecutionMapper;
-import com.fitnessapp.fitapp_api.route.model.Route;
 import com.fitnessapp.fitapp_api.routeexecution.model.RouteExecution;
 import com.fitnessapp.fitapp_api.routeexecution.model.RouteExecution.RouteExecutionStatus;
 import com.fitnessapp.fitapp_api.routeexecution.repository.RouteExecutionRepository;
-import com.fitnessapp.fitapp_api.route.repository.RouteRepository;
-import com.fitnessapp.fitapp_api.profile.model.UserProfile;
-import com.fitnessapp.fitapp_api.profile.repository.UserProfileRepository;
-import com.fitnessapp.fitapp_api.auth.model.UserAuth;
-import com.fitnessapp.fitapp_api.auth.repository.UserAuthRepository;
 import com.fitnessapp.fitapp_api.routeexecution.service.RouteExecutionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -253,13 +254,25 @@ public class RouteExecutionServiceImpl implements RouteExecutionService {
     }
 
     /**
-     * Listar ejecuciones del usuario
+     * Listar ejecuciones totales del usuario
      */
     @Transactional(readOnly = true)
     public List<RouteExecutionResponseDTO> getMyExecutions(String email) {
         return executionRepository.findAllByUserEmail(email)
                 .stream()
                 .map(mapper::toResponseDto)
+                .toList();
+    }
+
+    /**
+     * Obtener historial de ejecuciones completadas del usuario
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<RouteExecutionHistoryResponseDTO> getMyCompletedExecutionsHistory(String email) {
+        return executionRepository.findAllByUserEmailAndStatusOrderByEndTimeDesc(email, RouteExecutionStatus.FINISHED)
+                .stream()
+                .map(mapper::toHistoryResponseDto)
                 .toList();
     }
 

@@ -188,7 +188,7 @@ public class RouteExecutionController {
                             description = "Historial de ejecuciones obtenido correctamente",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = RouteExecutionResponseDTO.class)
+                                    schema = @Schema(implementation = RouteExecutionHistoryResponseDTO.class)
                             )
                     ),
                     @ApiResponse(responseCode = "401", description = "No autorizado", content = @Content)

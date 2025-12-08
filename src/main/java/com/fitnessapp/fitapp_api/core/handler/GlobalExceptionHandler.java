@@ -15,6 +15,7 @@ import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -232,6 +233,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(UserProfileNotCompletedException.class)
     public ResponseEntity<Object> handleUserProfileNotCompleted(UserProfileNotCompletedException ex, HttpServletRequest req) {
         return errorFactory.entity(HttpStatus.UNPROCESSABLE_ENTITY, "user_profile_not_completed",
+                ex.getMessage(), req.getRequestURI(), Map.of());
+    }
+
+    /**
+     * 401 - Contraseña actual incorrecta
+     */
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<Object> handleInvalidPassword(InvalidPasswordException ex, HttpServletRequest req) {
+        return errorFactory.entity(HttpStatus.BAD_REQUEST, "invalid_password",
                 ex.getMessage(), req.getRequestURI(), Map.of());
     }
 }

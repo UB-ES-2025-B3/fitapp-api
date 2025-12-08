@@ -5,6 +5,7 @@ import com.fitnessapp.fitapp_api.auth.mapper.UserAuthMapper;
 import com.fitnessapp.fitapp_api.auth.model.UserAuth;
 import com.fitnessapp.fitapp_api.auth.repository.UserAuthRepository;
 import com.fitnessapp.fitapp_api.auth.service.UserAuthService;
+import com.fitnessapp.fitapp_api.core.exception.InvalidPasswordException;
 import com.fitnessapp.fitapp_api.core.exception.UserAlreadyExistsException;
 import com.fitnessapp.fitapp_api.core.exception.UserAuthNotFoundException;
 import com.fitnessapp.fitapp_api.core.util.JwtUtils;
@@ -93,7 +94,7 @@ public class UserAuthServiceImpl implements UserAuthService {
 
         // Verificar que la contraseña actual coincida
         if (!passwordEncoder.matches(dto.currentPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("Current password is incorrect");
+            throw new InvalidPasswordException("Current password is incorrect");
         }
 
         // Verificar que la nueva contraseña coincida con la confirmación

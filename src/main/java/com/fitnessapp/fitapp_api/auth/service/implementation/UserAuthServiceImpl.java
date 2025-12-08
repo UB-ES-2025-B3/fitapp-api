@@ -109,14 +109,14 @@ public class UserAuthServiceImpl implements UserAuthService {
         user.setPassword(passwordEncoder.encode(dto.newPassword()));
         userAuthRepository.save(user);
 
-        // Opcional: generar un nuevo token para mantener sesión activa
+        // Generar un nuevo token con la contraseña actualizada
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(email, dto.newPassword())
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtUtils.createToken(authentication);
 
-        // Retornar DTO con token actualizado y mensaje de éxito
+        // Retornar DTO con token actualizado
         return new UserAuthResponseDTO(user.getId(), token,
                 userProfileRepository.existsByUser_Email(email));
     }

@@ -237,11 +237,29 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
-     * 401 - Contraseña actual incorrecta
+     * 400 - Contraseña actual incorrecta
      */
     @ExceptionHandler(InvalidPasswordException.class)
     public ResponseEntity<Object> handleInvalidPassword(InvalidPasswordException ex, HttpServletRequest req) {
         return errorFactory.entity(HttpStatus.BAD_REQUEST, "invalid_password",
+                ex.getMessage(), req.getRequestURI(), Map.of());
+    }
+
+    /**
+     * 400 - Contraseña actual incorrecta
+     */
+    @ExceptionHandler(PasswordConfirmationException.class)
+    public ResponseEntity<Object> handlePasswordConfirmation(PasswordConfirmationException ex, HttpServletRequest req) {
+        return errorFactory.entity(HttpStatus.BAD_REQUEST, "passwords_do_not_match",
+                ex.getMessage(), req.getRequestURI(), Map.of());
+    }
+
+    /**
+     * 400 - Contraseña no cumple los requisitos mínimos
+     */
+    @ExceptionHandler(InvalidPasswordFormatException.class)
+    public ResponseEntity<Object> handleInvalidPasswordFormat(InvalidPasswordFormatException ex, HttpServletRequest req) {
+        return errorFactory.entity(HttpStatus.BAD_REQUEST, "password_format_invalid",
                 ex.getMessage(), req.getRequestURI(), Map.of());
     }
 }

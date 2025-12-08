@@ -5,9 +5,7 @@ import com.fitnessapp.fitapp_api.auth.mapper.UserAuthMapper;
 import com.fitnessapp.fitapp_api.auth.model.UserAuth;
 import com.fitnessapp.fitapp_api.auth.repository.UserAuthRepository;
 import com.fitnessapp.fitapp_api.auth.service.UserAuthService;
-import com.fitnessapp.fitapp_api.core.exception.InvalidPasswordException;
-import com.fitnessapp.fitapp_api.core.exception.UserAlreadyExistsException;
-import com.fitnessapp.fitapp_api.core.exception.UserAuthNotFoundException;
+import com.fitnessapp.fitapp_api.core.exception.*;
 import com.fitnessapp.fitapp_api.core.util.JwtUtils;
 import com.fitnessapp.fitapp_api.profile.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
@@ -99,12 +97,12 @@ public class UserAuthServiceImpl implements UserAuthService {
 
         // Verificar que la nueva contraseña coincida con la confirmación
         if (!dto.newPassword().equals(dto.confirmPassword())) {
-            throw new IllegalArgumentException("New password and confirmation do not match");
+            throw new PasswordConfirmationException("New password and confirmation do not match");
         }
 
         // Verificar que la nueva contraseña cumple los requisitos mínimos
         if (!dto.newPassword().matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[^A-Za-z\\d]).{8,}$")) {
-            throw new IllegalArgumentException("New password does not meet requirements");
+            throw new InvalidPasswordFormatException("New password does not meet requirements");
         }
 
         // Codificar y guardar la nueva contraseña

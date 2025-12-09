@@ -1,6 +1,7 @@
 package com.fitnessapp.fitapp_api.routeexecution.mapper;
 
 import com.fitnessapp.fitapp_api.auth.model.UserAuth;
+import com.fitnessapp.fitapp_api.routeexecution.dto.RouteExecutionHistoryResponseDTO;
 import com.fitnessapp.fitapp_api.routeexecution.dto.RouteExecutionRequestDTO;
 import com.fitnessapp.fitapp_api.routeexecution.dto.RouteExecutionResponseDTO;
 import com.fitnessapp.fitapp_api.routeexecution.model.RouteExecution;
@@ -23,6 +24,7 @@ public interface RouteExecutionMapper {
     @Mapping(target = "totalPausedTimeSec", ignore = true)
     @Mapping(target = "durationSec", ignore = true)
     @Mapping(target = "calories", ignore = true)
+    @Mapping(target = "points" , ignore = true)
     RouteExecution toEntity(RouteExecutionRequestDTO dto, UserAuth userAuth);
 
     // --- ACTUALIZAR ---
@@ -35,5 +37,10 @@ public interface RouteExecutionMapper {
     @Mapping(target = "routeId", expression = "java(execution.getRoute() != null ? execution.getRoute().getId() : null)")
     @Mapping(target = "routeName", expression = "java(execution.getRoute() != null ? execution.getRoute().getName() : \"Ruta Eliminada\")")
     RouteExecutionResponseDTO toResponseDto(RouteExecution execution);
+
+    // --- HISTORIAL ---
+    @Mapping(target = "routeName", expression = "java(execution.getRoute() != null ? execution.getRoute().getName() : \"Ruta Eliminada\")")
+    @Mapping(target = "distanceKm", expression = "java(execution.getRoute() != null ? execution.getRoute().getDistanceKm() : null)")
+    RouteExecutionHistoryResponseDTO toHistoryResponseDto(RouteExecution execution);
 
 }

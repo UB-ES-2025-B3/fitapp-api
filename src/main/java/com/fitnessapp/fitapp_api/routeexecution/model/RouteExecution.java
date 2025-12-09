@@ -63,6 +63,9 @@ public class RouteExecution {
     @Column(name = "calories", precision = 10, scale = 2, nullable = true)
     private BigDecimal calories;
 
+    @Column(name = "points", nullable = false)
+    private Long points = 0L;
+
     @Column(name = "notes", length = 500)
     private String notes;
 

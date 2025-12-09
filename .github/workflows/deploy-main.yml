@@ -3,29 +3,53 @@ name: CI/CD Backend - Azure App Service
 on:
   push:
     branches:
-      - main      # Despliegue a PROD
-      - preprod   # Despliegue a PREPROD
+      - main
+      - preprod
+  pull_request:
+    branches: [ main, preprod, dev ]
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  # --- JOB 1: CI (Calidad del Código) ---
+  ci-check:
+    name: Compilación y Tests (Java 21)
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
 
-    # Selección automática del entorno
+      - name: Setup Java JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin' # Coincide con la imagen base del Dockerfile
+          cache: 'maven'
+
+      # Ejecutamos los tests aquí porque el Dockerfile tiene "-DskipTests"
+      # Si esto falla, no pasamos al despliegue.
+      - name: Ejecutar Tests Unitarios
+        run: mvn test
+
+  # --- JOB 2: DESPLIEGUE ---
+  build-and-deploy:
+    name: Desplegar a Azure
+    runs-on: ubuntu-latest
+    needs: ci-check
+
+    # Solo despliega si el CI pasó y es un push a main/preprod
+    if: success() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+
     environment: ${{ github.ref == 'refs/heads/main' && 'prod' || 'preprod' }}
 
     steps:
-      # 1. Descargar código
       - name: Checkout del repositorio
         uses: actions/checkout@v4
 
-      # 2. Login en Azure
       - name: 'Login en Azure'
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # 3. Login en ACR
       - name: 'Login en Azure Container Registry'
         uses: azure/docker-login@v1
         with:
@@ -33,21 +57,27 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
-      # 4. Build & Push
+      # Aquí Docker volverá a compilar usando el Dockerfile
+      # Esto garantiza que despliega en un entorno limpio e idéntico al de producción.
       - name: Construir y subir la imagen Docker
+        # Construimos la imagen y le asignamos DOS tags
+        # 1. El específico (SHA) para el despliegue seguro.
+        # 2. El genérico (latest) para que el Front la encuentre.
+        # Y subimos ambas etiquetas al registro
         run: |
-          docker build . -t ${{ secrets.ACR_LOGIN_SERVER }}/fitapp-backend:${{ github.sha }}
+          docker build . \
+          -t ${{ secrets.ACR_LOGIN_SERVER }}/fitapp-backend:${{ github.sha }} \
+          -t ${{ secrets.ACR_LOGIN_SERVER }}/fitapp-backend:latest
+          
           docker push ${{ secrets.ACR_LOGIN_SERVER }}/fitapp-backend:${{ github.sha }}
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/fitapp-backend:latest
 
-      # 5. Desplegar
-      # VARIABLE 'APP_NAME' para el nombre del recurso al cual desplegamos, según el entorno/rama
       - name: 'Desplegar en Azure App Service'
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ vars.APP_NAME }}
           images: '${{ secrets.ACR_LOGIN_SERVER }}/fitapp-backend:${{ github.sha }}'
 
-      # 6. Logout
       - name: Logout de Azure
         if: always()
         run: |

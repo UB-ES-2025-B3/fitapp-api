@@ -1,23 +1,26 @@
 package com.fitnessapp.fitapp_api.routeexecution.service.implementation;
 
+import com.fitnessapp.fitapp_api.auth.model.UserAuth;
+import com.fitnessapp.fitapp_api.auth.repository.UserAuthRepository;
+import com.fitnessapp.fitapp_api.calories.dto.CCActivityRequest;
 import com.fitnessapp.fitapp_api.calories.service.CalorieCalculationService;
-import com.fitnessapp.fitapp_api.calories.service.dto.CCActivityRequest;
 import com.fitnessapp.fitapp_api.core.exception.RouteExecutionNotFoundException;
 import com.fitnessapp.fitapp_api.core.exception.RouteNotFoundException;
 import com.fitnessapp.fitapp_api.core.exception.UserAuthNotFoundException;
 import com.fitnessapp.fitapp_api.core.exception.UserProfileNotCompletedException;
+import com.fitnessapp.fitapp_api.gamification.dto.PCActivityRequestDTO;
+import com.fitnessapp.fitapp_api.gamification.service.PointsCalculationService;
+import com.fitnessapp.fitapp_api.profile.model.UserProfile;
+import com.fitnessapp.fitapp_api.profile.repository.UserProfileRepository;
+import com.fitnessapp.fitapp_api.route.model.Route;
+import com.fitnessapp.fitapp_api.route.repository.RouteRepository;
+import com.fitnessapp.fitapp_api.routeexecution.dto.RouteExecutionHistoryResponseDTO;
 import com.fitnessapp.fitapp_api.routeexecution.dto.RouteExecutionRequestDTO;
 import com.fitnessapp.fitapp_api.routeexecution.dto.RouteExecutionResponseDTO;
 import com.fitnessapp.fitapp_api.routeexecution.mapper.RouteExecutionMapper;
-import com.fitnessapp.fitapp_api.route.model.Route;
 import com.fitnessapp.fitapp_api.routeexecution.model.RouteExecution;
 import com.fitnessapp.fitapp_api.routeexecution.model.RouteExecution.RouteExecutionStatus;
 import com.fitnessapp.fitapp_api.routeexecution.repository.RouteExecutionRepository;
-import com.fitnessapp.fitapp_api.route.repository.RouteRepository;
-import com.fitnessapp.fitapp_api.profile.model.UserProfile;
-import com.fitnessapp.fitapp_api.profile.repository.UserProfileRepository;
-import com.fitnessapp.fitapp_api.auth.model.UserAuth;
-import com.fitnessapp.fitapp_api.auth.repository.UserAuthRepository;
 import com.fitnessapp.fitapp_api.routeexecution.service.RouteExecutionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +44,7 @@ public class RouteExecutionServiceImpl implements RouteExecutionService {
     private final UserProfileRepository userProfileRepository;
     private final RouteExecutionMapper mapper;
     private final CalorieCalculationService calorieCalculationService;
+    private final PointsCalculationService pointsCalculationService;
 
     /**
      * Inicia una ejecución: crea entidad con status IN_PROGRESS y startTime = now.
@@ -166,6 +170,9 @@ public class RouteExecutionServiceImpl implements RouteExecutionService {
         // Método seguro para calcular calorías sin romper la transacción
         calculateAndSetCaloriesSafe(email, exec);
 
+        // Método seguro para calcular puntos sin romper la transacción
+        calculateAndSetPointsSafe(exec);
+
         RouteExecution saved = executionRepository.save(exec);
         return mapper.toResponseDto(saved);
     }
@@ -206,13 +213,66 @@ public class RouteExecutionServiceImpl implements RouteExecutionService {
     }
 
     /**
-     * Listar ejecuciones del usuario
+     * Nuevo método helper para blindar el cálculo de puntos
+     */
+    private void calculateAndSetPointsSafe(RouteExecution exec) {
+        if (exec.getDurationSec() == null || exec.getDurationSec() <= 0) {
+            exec.setPoints(0L);
+            return;
+        }
+        try {
+            UserProfile profile = userProfileRepository.findByUser_Email(
+                    exec.getUser().getEmail()).orElse(null);
+
+            if (profile != null) {
+                if (exec.getActivityType() == null) {
+                    throw new IllegalArgumentException("Activity type is required for points calculation");
+                }
+                PCActivityRequestDTO pcRequest = new PCActivityRequestDTO(
+                        exec.getRoute().getDistanceKm().doubleValue(),
+                        exec.getDurationSec(),
+                        exec.getActivityType().toString(),
+                        calorieCalculationService.hasReachedDailyGoal(profile)
+                );
+                long points = pointsCalculationService.calculatePoints(pcRequest);
+                exec.setPoints(points);
+
+                long currentPoints = profile.getPoints() != null ? profile.getPoints() : 0L;
+                profile.setPoints(currentPoints + points);
+                userProfileRepository.save(profile);
+            } else {
+                log.warn("No points calculation: User profile not found for email {}", exec.getUser().getEmail());
+                exec.setPoints(0L);
+            }
+        } catch (IllegalArgumentException e) {
+            log.warn("Cannot calculate points for execution {}: {}", exec.getId(), e.getMessage());
+            exec.setPoints(0L);
+        } catch (Exception e) {
+            log.error("Unexpected error calculating points for execution {}", exec.getId(), e);
+            exec.setPoints(0L);
+        }
+    }
+
+    /**
+     * Listar ejecuciones totales del usuario
      */
     @Transactional(readOnly = true)
     public List<RouteExecutionResponseDTO> getMyExecutions(String email) {
         return executionRepository.findAllByUserEmail(email)
                 .stream()
                 .map(mapper::toResponseDto)
+                .toList();
+    }
+
+    /**
+     * Obtener historial de ejecuciones completadas del usuario
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<RouteExecutionHistoryResponseDTO> getMyCompletedExecutionsHistory(String email) {
+        return executionRepository.findAllByUserEmailAndStatusOrderByEndTimeDesc(email, RouteExecutionStatus.FINISHED)
+                .stream()
+                .map(mapper::toHistoryResponseDto)
                 .toList();
     }
 

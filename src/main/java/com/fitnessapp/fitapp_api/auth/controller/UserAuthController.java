@@ -1,9 +1,6 @@
 package com.fitnessapp.fitapp_api.auth.controller;
 
-import com.fitnessapp.fitapp_api.auth.dto.LoginUserRequestDTO;
-import com.fitnessapp.fitapp_api.auth.dto.LoginUserResponseDTO;
-import com.fitnessapp.fitapp_api.auth.dto.RegisterUserRequestDTO;
-import com.fitnessapp.fitapp_api.auth.dto.UserAuthResponseDTO;
+import com.fitnessapp.fitapp_api.auth.dto.*;
 import com.fitnessapp.fitapp_api.auth.service.UserAuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -19,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
@@ -106,5 +104,40 @@ public class UserAuthController {
     public ResponseEntity<LoginUserResponseDTO> login(@Valid @RequestBody LoginUserRequestDTO loginUserRequestDTO) {
         LoginUserResponseDTO userAuthResponseDTO = userAuthService.login(loginUserRequestDTO);
         return ResponseEntity.ok(userAuthResponseDTO);
+    }
+
+    @Operation(
+            summary = "Cambiar contraseña del usuario",
+            description = "Permite a un usuario autenticado cambiar su contraseña actual por una nueva.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ChangePasswordRequestDTO.class)
+                    )
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Contraseña actualizada correctamente",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = UserAuthResponseDTO.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Error en los datos introducidos (ej: contraseña actual incorrecta, nuevas contraseñas no coinciden, formato inválido)",
+                            content = @Content(mediaType = "application/json")
+                    )
+            }
+    )
+    @PostMapping("/change-password")
+    public ResponseEntity<UserAuthResponseDTO> changePassword(
+            Principal principal,
+            @Valid @RequestBody ChangePasswordRequestDTO requestDTO
+    ) {
+        UserAuthResponseDTO response = userAuthService.changePassword(principal.getName(), requestDTO);
+        return ResponseEntity.ok(response);
     }
 }

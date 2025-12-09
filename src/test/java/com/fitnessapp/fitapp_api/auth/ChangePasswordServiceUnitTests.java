@@ -5,6 +5,9 @@ import com.fitnessapp.fitapp_api.auth.dto.UserAuthResponseDTO;
 import com.fitnessapp.fitapp_api.auth.model.UserAuth;
 import com.fitnessapp.fitapp_api.auth.repository.UserAuthRepository;
 import com.fitnessapp.fitapp_api.auth.service.implementation.UserAuthServiceImpl;
+import com.fitnessapp.fitapp_api.core.exception.InvalidPasswordException;
+import com.fitnessapp.fitapp_api.core.exception.InvalidPasswordFormatException;
+import com.fitnessapp.fitapp_api.core.exception.PasswordConfirmationException;
 import com.fitnessapp.fitapp_api.core.exception.UserAuthNotFoundException;
 import com.fitnessapp.fitapp_api.core.util.JwtUtils;
 import com.fitnessapp.fitapp_api.profile.repository.UserProfileRepository;
@@ -107,7 +110,7 @@ class ChangePasswordServiceUnitTests {
     // ============================================
 
     @Test
-    @DisplayName("changePassword — contraseña actual incorrecta → IllegalArgumentException")
+    @DisplayName("changePassword — contraseña actual incorrecta → InvalidPasswordException")
     void changePassword_WrongCurrentPassword_ShouldThrow() {
 
         ChangePasswordRequestDTO req = new ChangePasswordRequestDTO(
@@ -119,7 +122,7 @@ class ChangePasswordServiceUnitTests {
         when(userAuthRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("WrongPassword!", user.getPassword())).thenReturn(false);
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(InvalidPasswordException.class,
                 () -> service.changePassword(user.getEmail(), req));
     }
 
@@ -128,7 +131,7 @@ class ChangePasswordServiceUnitTests {
     // ============================================
 
     @Test
-    @DisplayName("changePassword — confirmación no coincide → IllegalArgumentException")
+    @DisplayName("changePassword — confirmación no coincide → PasswordConfirmationException")
     void changePassword_NewPasswordMismatch_ShouldThrow() {
 
         ChangePasswordRequestDTO req = new ChangePasswordRequestDTO(
@@ -140,7 +143,7 @@ class ChangePasswordServiceUnitTests {
         when(userAuthRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("OldPass123!", user.getPassword())).thenReturn(true);
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(PasswordConfirmationException.class,
                 () -> service.changePassword(user.getEmail(), req));
     }
 
@@ -149,7 +152,7 @@ class ChangePasswordServiceUnitTests {
     // ============================================
 
     @Test
-    @DisplayName("changePassword — nueva password no cumple requisitos → IllegalArgumentException")
+    @DisplayName("changePassword — nueva password no cumple requisitos → InvalidPasswordFormatException")
     void changePassword_NewPasswordInvalid_ShouldThrow() {
 
         ChangePasswordRequestDTO req = new ChangePasswordRequestDTO(
@@ -161,7 +164,7 @@ class ChangePasswordServiceUnitTests {
         when(userAuthRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("OldPass123!", user.getPassword())).thenReturn(true);
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(InvalidPasswordFormatException.class,
                 () -> service.changePassword(user.getEmail(), req));
     }
 }

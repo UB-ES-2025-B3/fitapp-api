@@ -127,12 +127,7 @@ public class UserAuthController {
                     ),
                     @ApiResponse(
                             responseCode = "400",
-                            description = "Error en los datos introducidos (ej: contraseñas no coinciden, formato inválido)",
-                            content = @Content(mediaType = "application/json")
-                    ),
-                    @ApiResponse(
-                            responseCode = "401",
-                            description = "La contraseña actual no es correcta",
+                            description = "Error en los datos introducidos (ej: contraseña actual incorrecta, nuevas contraseñas no coinciden, formato inválido)",
                             content = @Content(mediaType = "application/json")
                     )
             }

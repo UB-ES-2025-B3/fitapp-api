@@ -1,7 +1,4 @@
-# -------------------------------------
 # ETAPA 1: BUILD (Construcción del JAR)
-# -------------------------------------
-# Usamos una imagen de Maven con Java 21
 FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
 
@@ -20,9 +17,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests -B
 
 
-# ------------------------------------------
 # ETAPA 2: RUNTIME (Despliegue de la Aplicación)
-# ------------------------------------------
 # Usamos una imagen muy ligera y segura: eclipse-temurin con JRE 21 y Alpine
 FROM eclipse-temurin:21-jre-alpine
 # Define el nombre final del JAR basado en tu pom.xml: fitapp_api-0.0.1-SNAPSHOT.jar
@@ -36,5 +31,7 @@ EXPOSE 8080
 COPY --from=build /app/target/${FINAL_JAR_NAME} app.jar
 
 # Comando para ejecutar la aplicación.
-# En esta etapa, el contenedor debe recibir las ENVS (DB_URL, PRIVATE_KEY, etc.).
-ENTRYPOINT ["java","-jar","/app/app.jar"]
+
+ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=80"
+
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]
